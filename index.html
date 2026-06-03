@@ -5,15 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gran Marqués - MarquesCheck PWA</title>
     
-    <!-- Google Fonts - Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Supabase JS -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -32,7 +29,6 @@
         }
     </script>
     <style>
-        /* Checkboxes tipo 'Chip' optimizados para pulgar */
         .pop-chip input[type="checkbox"] { display: none; }
         .pop-chip label {
             display: inline-flex; align-items: center; cursor: pointer; transition: all 0.2s ease;
@@ -41,34 +37,21 @@
             background-color: #0284c7; color: white; border-color: #0284c7;
             box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.3);
         }
-
-        #foto-preview-container img { max-height: 200px; width: auto; border-radius: 0.75rem; }
         
-        .spinner {
-            border: 2px solid rgba(255, 255, 255, 0.3); border-radius: 50%;
-            border-top: 2px solid white; width: 16px; height: 16px;
-            animation: spin 1s linear infinite; display: none; margin-right: 8px;
-        }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        body.loading .spinner { display: inline-block; }
-        body.loading #btnText { display: none; }
-        
-        /* Ocultar scrollbar en la lista de autocompletado */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-brand-50 text-brand-900 font-sans antialiased min-h-screen pb-10">
+<body class="bg-brand-50 text-brand-900 font-sans antialiased min-h-screen pb-10 relative">
 
-    <!-- Header -->
-    <header class="bg-white shadow-sm sticky top-0 z-50 border-b border-gray-100">
+    <header class="bg-white shadow-sm sticky top-0 z-40 border-b border-gray-100">
         <nav class="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <svg class="w-7 h-7 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
                 <span class="text-xl font-extrabold tracking-tighter text-brand-900">
-                    GranMarques<span class="text-brand-600"> Check</span>
+                    Marques<span class="text-brand-600">Check</span>
                 </span>
             </div>
             <div class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
@@ -77,21 +60,18 @@
         </nav>
     </header>
 
-    <!-- Main Content -->
     <main class="max-w-lg mx-auto p-4">
         
         <div class="mb-6">
             <h1 class="text-2xl font-extrabold tracking-tight">Registro de Visita</h1>
-            <p class="text-gray-600 text-sm mt-1">Complete los detalles y adjunte evidencia.</p>
+            <p class="text-gray-600 text-sm mt-1">Complete los detalles y adjunte evidencias.</p>
         </div>
 
         <form id="popForm" class="space-y-5">
             
-            <!-- Card de Datos Generales -->
             <section class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
                 <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-2">Datos Generales</h2>
                 
-                <!-- Autocompletado de Promotor -->
                 <div class="relative">
                     <label for="promotor" class="block text-sm font-semibold text-gray-700 mb-1.5">Promotor / Vendedor</label>
                     <div class="relative">
@@ -101,10 +81,7 @@
                         <input type="text" id="promotor" name="promotor" required placeholder="Escribe para buscar o añadir..." autocomplete="off"
                             class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition duration-150 text-base">
                     </div>
-                    <!-- Lista de sugerencias (oculta por defecto) -->
-                    <ul id="sugerencias-promotor" class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto hidden no-scrollbar divide-y divide-gray-100">
-                        <!-- Las sugerencias se insertan aquí vía JS -->
-                    </ul>
+                    <ul id="sugerencias-promotor" class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto hidden no-scrollbar divide-y divide-gray-100"></ul>
                 </div>
 
                 <div>
@@ -140,7 +117,6 @@
                 </div>
             </section>
 
-            <!-- Card de Materiales -->
             <section class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-3">Material POP</h2>
                 <div class="flex flex-wrap gap-2 pop-chip">
@@ -167,39 +143,44 @@
                 </div>
             </section>
 
-            <!-- Card de Evidencia Fotográfica -->
             <section class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
-                <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-3">Evidencia Fotográfica</h2>
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider">Evidencias Fotográficas</h2>
+                    <span id="contador-fotos" class="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">0 fotos</span>
+                </div>
+                
                 <div class="space-y-4">
-                    <button type="button" onclick="document.getElementById('foto').click()" 
+                    <div id="fotos-grid" class="grid grid-cols-3 gap-3 hidden">
+                        </div>
+
+                    <button type="button" id="btnAddPhoto" 
                         class="w-full flex items-center justify-center gap-2.5 px-4 py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-brand-400 hover:bg-brand-50 transition active:bg-brand-100">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        <span class="font-semibold">Tomar Foto</span>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" class="hidden"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        <span class="font-semibold" id="txtBtnPhoto">Tomar Foto</span>
                     </button>
 
-                    <input type="file" id="foto" name="foto" accept="image/*" capture="environment" class="hidden">
-
-                    <div id="foto-preview-container" class="hidden flex flex-col items-center justify-center p-2 border border-gray-100 rounded-2xl bg-gray-50 relative">
-                        <img id="foto-preview-img" src="#" alt="Previsualización" class="object-cover shadow-sm w-full">
-                        <p id="foto-filename" class="text-xs text-gray-500 mt-2 truncate max-w-full px-2"></p>
-                    </div>
+                    <input type="file" id="fotoInput" accept="image/*" capture="environment" multiple class="hidden">
                 </div>
             </section>
 
-            <!-- Botón de Envío -->
-            <div class="pt-2 sticky bottom-4 z-40">
+            <div class="pt-2 sticky bottom-4 z-30">
                 <button type="submit" id="btnSubmit" 
                     class="w-full flex items-center justify-center bg-brand-600 hover:bg-brand-700 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-brand-200 transition duration-150 active:scale-[0.98]">
-                    <div class="spinner" id="loadingSpinner"></div>
-                    <span id="btnText">Enviar Registro</span>
-                    <span id="btnTextLoading" class="hidden">Subiendo datos...</span>
+                    <span>Guardar Registro</span>
                 </button>
             </div>
         </form>
     </main>
 
-    <!-- Notificaciones Toast -->
-    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[100] transform -translate-y-20 opacity-0 transition-all duration-300 ease-out w-11/12 max-w-sm">
+    <div id="loadingModal" class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm z-[999] hidden flex items-center justify-center transition-opacity duration-300">
+        <div class="bg-white p-8 rounded-2xl flex flex-col items-center shadow-2xl w-10/12 max-w-sm text-center">
+            <div class="w-14 h-14 border-4 border-brand-100 border-t-brand-600 rounded-full animate-spin mb-4"></div>
+            <h3 class="text-xl font-extrabold text-gray-900 mb-1">Procesando...</h3>
+            <p id="loadingStatus" class="text-sm text-gray-500 font-medium">Iniciando subida de datos</p>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[1000] transform -translate-y-24 opacity-0 transition-all duration-300 ease-out w-11/12 max-w-sm">
         <div class="flex items-center gap-3 bg-gray-900 text-white px-5 py-4 rounded-xl shadow-2xl">
             <div id="toastIconSuccess" class="hidden text-green-400">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
@@ -221,25 +202,31 @@
         const form = document.getElementById('popForm');
         const inputPromotor = document.getElementById('promotor');
         const listaSugerencias = document.getElementById('sugerencias-promotor');
-        const fileInput = document.getElementById('foto');
-        const previewContainer = document.getElementById('foto-preview-container');
-        const previewImg = document.getElementById('foto-preview-img');
-        const filenameLabel = document.getElementById('foto-filename');
         const btnSubmit = document.getElementById('btnSubmit');
+        
+        // Elementos de Fotos
+        const btnAddPhoto = document.getElementById('btnAddPhoto');
+        const fotoInput = document.getElementById('fotoInput');
+        const fotosGrid = document.getElementById('fotos-grid');
+        const contadorFotos = document.getElementById('contador-fotos');
+        const txtBtnPhoto = document.getElementById('txtBtnPhoto');
+        
+        // Elementos del Modal
+        const loadingModal = document.getElementById('loadingModal');
+        const loadingStatus = document.getElementById('loadingStatus');
+
+        // Almacén temporal de archivos de imagen
+        let fotosArray = [];
 
         // --- LÓGICA DE AUTOCOMPLETADO (PROMOTOR) ---
         let debounceTimer;
-        
         inputPromotor.addEventListener('input', (e) => {
             clearTimeout(debounceTimer);
             const query = e.target.value.trim();
-            
             if (query.length < 2) {
                 listaSugerencias.classList.add('hidden');
                 return;
             }
-
-            // Esperar 300ms después de que el usuario deje de escribir para consultar a Supabase
             debounceTimer = setTimeout(async () => {
                 const { data, error } = await supabase
                     .from('sorteo_promotores')
@@ -252,7 +239,6 @@
                     data.forEach(promotor => {
                         const li = document.createElement('li');
                         li.textContent = promotor.nombre;
-                        // Estilos táctiles (mobile first)
                         li.className = 'px-4 py-3 cursor-pointer hover:bg-brand-50 active:bg-brand-100 text-gray-700 text-base';
                         li.addEventListener('click', () => {
                             inputPromotor.value = promotor.nombre;
@@ -267,58 +253,111 @@
             }, 300);
         });
 
-        // Ocultar lista al hacer click afuera
         document.addEventListener('click', (e) => {
             if (e.target !== inputPromotor && e.target !== listaSugerencias) {
                 listaSugerencias.classList.add('hidden');
             }
         });
 
-        // --- PREVISUALIZACIÓN DE FOTO ---
-        fileInput.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                filenameLabel.textContent = file.name;
-                reader.onload = function(event) {
-                    previewImg.setAttribute('src', event.target.result);
-                    previewContainer.classList.remove('hidden');
-                }
-                reader.readAsDataURL(file);
-            } else {
-                previewContainer.classList.add('hidden');
-            }
+        // --- LÓGICA MULTI-FOTOS CON PREVIEW ---
+        btnAddPhoto.addEventListener('click', () => {
+            fotoInput.click();
         });
 
-        // --- ENVÍO DEL FORMULARIO ---
+        fotoInput.addEventListener('change', (e) => {
+            const files = e.target.files;
+            if (!files || files.length === 0) return;
+
+            // Recorremos los archivos (por si eligen varios de la galería)
+            for (let i = 0; i < files.length; i++) {
+                fotosArray.push(files[i]);
+            }
+            
+            actualizarUIFotos();
+            fotoInput.value = ''; // Limpiar el input para permitir misma foto
+        });
+
+        function actualizarUIFotos() {
+            fotosGrid.innerHTML = '';
+            
+            if (fotosArray.length > 0) {
+                fotosGrid.classList.remove('hidden');
+                txtBtnPhoto.textContent = 'Añadir otra foto';
+                contadorFotos.textContent = `${fotosArray.length} foto${fotosArray.length > 1 ? 's' : ''}`;
+                contadorFotos.classList.replace('text-gray-500', 'text-brand-600');
+                contadorFotos.classList.replace('bg-gray-100', 'bg-brand-100');
+            } else {
+                fotosGrid.classList.add('hidden');
+                txtBtnPhoto.textContent = 'Tomar Foto';
+                contadorFotos.textContent = '0 fotos';
+                contadorFotos.classList.replace('text-brand-600', 'text-gray-500');
+                contadorFotos.classList.replace('bg-brand-100', 'bg-gray-100');
+            }
+
+            // Crear los recuadros de preview dinámicamente
+            fotosArray.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const div = document.createElement('div');
+                    div.className = 'relative rounded-xl overflow-hidden shadow-sm border border-gray-200 aspect-square bg-gray-50';
+                    div.innerHTML = `
+                        <img src="${event.target.result}" class="w-full h-full object-cover">
+                        <button type="button" class="btn-eliminar-foto absolute top-1 right-1 bg-red-500 text-white p-1.5 rounded-full shadow-lg hover:bg-red-600 active:scale-90 transition" data-index="${index}">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l18 18"></path></svg>
+                        </button>
+                    `;
+                    fotosGrid.appendChild(div);
+
+                    // Asignar evento de eliminación al botón creado
+                    div.querySelector('.btn-eliminar-foto').addEventListener('click', function() {
+                        const idx = parseInt(this.getAttribute('data-index'));
+                        fotosArray.splice(idx, 1);
+                        actualizarUIFotos(); // Volver a renderizar
+                    });
+                }
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // --- ENVÍO DEL FORMULARIO Y MODAL ---
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
-            setLoading(true);
+            
+            if (fotosArray.length === 0) {
+                showToast('Por favor, tome al menos una foto de evidencia.', 'error');
+                return;
+            }
+
+            mostrarModal(true);
 
             try {
-                const file = fileInput.files[0];
-                if (!file) throw new Error('Por favor, tome una foto de evidencia.');
-
-                // 1. Verificar y guardar al promotor si no existe
-                const promotorNombre = inputPromotor.value.trim().toUpperCase(); // Guardar en mayúsculas para mejor consistencia
-                
-                // Usamos 'upsert' que inserta si no existe, o ignora si ya está (basado en la restricción UNIQUE)
+                actualizarTextoModal('Verificando promotor...');
+                const promotorNombre = inputPromotor.value.trim().toUpperCase();
                 await supabase
                     .from('sorteo_promotores')
                     .upsert([{ nombre: promotorNombre }], { onConflict: 'nombre' });
 
-                // 2. Subir imagen
-                const fileExt = file.name.split('.').pop();
-                const fileName = `${Date.now()}_evidencia.${fileExt}`;
+                actualizarTextoModal('Subiendo fotos (0/' + fotosArray.length + ')...');
+                const rutasFotosSubidas = [];
                 
-                const { data: storageData, error: storageError } = await supabase.storage
-                    .from('evidencias')
-                    .upload(fileName, file);
+                for (let i = 0; i < fotosArray.length; i++) {
+                    const file = fotosArray[i];
+                    const fileExt = file.name.split('.').pop();
+                    const randomStr = Math.random().toString(36).substring(2, 8);
+                    const fileName = `${Date.now()}_${randomStr}_evidencia.${fileExt}`;
+                    
+                    const { data: storageData, error: storageError } = await supabase.storage
+                        .from('evidencias')
+                        .upload(fileName, file);
 
-                if (storageError) throw new Error('Error al subir la foto.');
-                const fotoPath = storageData.path; 
+                    if (storageError) throw new Error(`Error al subir la foto #${i + 1}.`);
+                    
+                    rutasFotosSubidas.push(storageData.path);
+                    actualizarTextoModal(`Subiendo fotos (${i + 1}/${fotosArray.length})...`);
+                }
 
-                // 3. Recopilar resto de datos
+                actualizarTextoModal('Guardando registro en la base de datos...');
+                
                 const cliente = document.getElementById('cliente').value;
                 const estado = document.getElementById('estado').value;
                 const materiales = Array.from(document.querySelectorAll('.mat-check:checked')).map(cb => cb.value);
@@ -326,7 +365,6 @@
                 if (materiales.length === 0) throw new Error('Seleccione al menos un material POP.');
                 if (!estado) throw new Error('Debe seleccionar un estado.');
 
-                // 4. Insertar registro principal
                 const { error: dbError } = await supabase
                     .from('sorteo_registros')
                     .insert([{
@@ -334,37 +372,39 @@
                         cliente_nombre: cliente,
                         estado: estado,
                         materiales_entregados: materiales,
-                        foto_url: fotoPath 
+                        fotos_urls: rutasFotosSubidas
                     }]);
 
-                if (dbError) throw new Error('Error al guardar el registro.');
+                if (dbError) throw new Error('Error al guardar el registro en la base de datos.');
 
+                mostrarModal(false);
                 showToast('Visita registrada con éxito', 'success');
+                
+                // Limpiar formulario
                 form.reset();
-                previewContainer.classList.add('hidden');
+                fotosArray = [];
+                actualizarUIFotos();
 
             } catch (err) {
+                mostrarModal(false);
                 showToast(err.message, 'error');
-            } finally {
-                setLoading(false);
             }
         });
 
-        // --- FUNCIONES AUXILIARES ---
-        function setLoading(isLoading) {
-            if (isLoading) {
-                document.body.classList.add('loading');
+        // --- FUNCIONES AUXILIARES (MODAL Y TOAST) ---
+        function mostrarModal(mostrar) {
+            if (mostrar) {
+                loadingModal.classList.remove('hidden');
                 btnSubmit.disabled = true;
-                btnSubmit.classList.add('opacity-80', 'cursor-not-allowed');
-                document.getElementById('btnText').classList.add('hidden');
-                document.getElementById('btnTextLoading').classList.remove('hidden');
             } else {
-                document.body.classList.remove('loading');
+                loadingModal.classList.add('hidden');
                 btnSubmit.disabled = false;
-                btnSubmit.classList.remove('opacity-80', 'cursor-not-allowed');
-                document.getElementById('btnText').classList.remove('hidden');
-                document.getElementById('btnTextLoading').classList.add('hidden');
+                loadingStatus.textContent = 'Iniciando subida de datos'; // reset text
             }
+        }
+
+        function actualizarTextoModal(texto) {
+            loadingStatus.textContent = texto;
         }
 
         function showToast(message, type) {
@@ -375,12 +415,12 @@
             document.getElementById('toastIconSuccess').classList.toggle('hidden', type !== 'success');
             document.getElementById('toastIconError').classList.toggle('hidden', type !== 'error');
 
-            toast.classList.remove('-translate-y-20', 'opacity-0');
+            toast.classList.remove('-translate-y-24', 'opacity-0');
             toast.classList.add('translate-y-0', 'opacity-100');
 
             setTimeout(() => {
                 toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('-translate-y-20', 'opacity-0');
+                toast.classList.add('-translate-y-24', 'opacity-0');
             }, 3500);
         }
     </script>
