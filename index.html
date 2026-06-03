@@ -211,21 +211,44 @@
                 </div>
 
                 <div class="space-y-4">
+                    <!-- Preview grid -->
                     <div id="fotos-grid" class="grid grid-cols-3 gap-3 hidden"></div>
 
-                    <button type="button" id="btnAddPhoto"
-                        class="w-full flex items-center justify-center gap-2.5 px-4 py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-brand-400 hover:bg-brand-50 transition active:bg-brand-100">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                        </svg>
-                        <span class="font-semibold" id="txtBtnPhoto">Tomar Foto</span>
-                    </button>
+                    <!--
+                        SOLUCIÓN CÁMARA:
+                        Dos inputs separados porque en iOS/Android mezclar
+                        capture="environment" con multiple rompe la cámara nativa.
+                        - cameraInput: capture="environment" sin multiple → abre cámara directamente
+                        - galleryInput: multiple sin capture → abre galería para elegir varias
+                    -->
+                    <div class="grid grid-cols-2 gap-3">
+                        <!-- Botón Cámara -->
+                        <button type="button" id="btnCamera"
+                            class="flex flex-col items-center justify-center gap-2 py-4 bg-brand-600 hover:bg-brand-700 active:scale-[0.97] text-white rounded-xl font-semibold text-sm transition shadow-md shadow-brand-200">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                            Tomar Foto
+                        </button>
 
-                    <!-- Sin 'capture' para permitir también galería en móvil -->
-                    <input type="file" id="fotoInput" accept="image/*" multiple class="hidden">
+                        <!-- Botón Galería -->
+                        <button type="button" id="btnGallery"
+                            class="flex flex-col items-center justify-center gap-2 py-4 border-2 border-gray-200 hover:border-brand-400 hover:bg-brand-50 active:scale-[0.97] text-gray-600 hover:text-brand-700 rounded-xl font-semibold text-sm transition">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            Galería
+                        </button>
+                    </div>
+
+                    <!-- Input cámara: capture fuerza cámara nativa, sin multiple -->
+                    <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
+                    <!-- Input galería: multiple para elegir varias fotos, sin capture -->
+                    <input type="file" id="galleryInput" accept="image/*" multiple class="hidden">
                 </div>
             </section>
 
@@ -303,11 +326,8 @@
     const inputPromotor    = document.getElementById('promotor');
     const listaSugerencias = document.getElementById('sugerencias-promotor');
     const btnSubmit        = document.getElementById('btnSubmit');
-    const btnAddPhoto      = document.getElementById('btnAddPhoto');
-    const fotoInput        = document.getElementById('fotoInput');
     const fotosGrid        = document.getElementById('fotos-grid');
     const contadorFotos    = document.getElementById('contador-fotos');
-    const txtBtnPhoto      = document.getElementById('txtBtnPhoto');
     const loadingModal     = document.getElementById('loadingModal');
     const loadingStatus    = document.getElementById('loadingStatus');
 
@@ -357,29 +377,41 @@
     });
 
     // ──────────────────────────────────────────────────────────────
-    // FOTOS — AGREGAR Y RENDERIZAR PREVIEW
+    // FOTOS — DOS INPUTS SEPARADOS (cámara nativa + galería)
+    //
+    // Por qué dos inputs:
+    //   • iOS ignora "multiple" cuando hay capture, y viceversa.
+    //   • Android se comporta diferente según fabricante.
+    //   • La única solución robusta es un input por modo.
     // ──────────────────────────────────────────────────────────────
-    btnAddPhoto.addEventListener('click', () => fotoInput.click());
+    const btnCamera    = document.getElementById('btnCamera');
+    const btnGallery   = document.getElementById('btnGallery');
+    const cameraInput  = document.getElementById('cameraInput');
+    const galleryInput = document.getElementById('galleryInput');
 
-    fotoInput.addEventListener('change', (e) => {
+    btnCamera.addEventListener('click',  () => cameraInput.click());
+    btnGallery.addEventListener('click', () => galleryInput.click());
+
+    function onFilesSelected(e) {
         const files = Array.from(e.target.files || []);
         if (!files.length) return;
         fotosArray.push(...files);
         renderFotos();
-        fotoInput.value = '';   // Permite seleccionar el mismo archivo de nuevo
-    });
+        e.target.value = '';   // Reset para poder volver a seleccionar
+    }
+
+    cameraInput.addEventListener('change',  onFilesSelected);
+    galleryInput.addEventListener('change', onFilesSelected);
 
     function renderFotos() {
         fotosGrid.innerHTML = '';
 
         if (fotosArray.length > 0) {
             fotosGrid.classList.remove('hidden');
-            txtBtnPhoto.textContent = 'Añadir otra foto';
             contadorFotos.textContent = `${fotosArray.length} foto${fotosArray.length !== 1 ? 's' : ''}`;
             contadorFotos.className = 'text-xs font-semibold text-brand-600 bg-brand-100 px-2 py-1 rounded-md';
         } else {
             fotosGrid.classList.add('hidden');
-            txtBtnPhoto.textContent = 'Tomar Foto';
             contadorFotos.textContent = '0 fotos';
             contadorFotos.className = 'text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md';
         }
