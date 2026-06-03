@@ -94,10 +94,10 @@
             <section class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
                 <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider">Datos Generales</h2>
 
-                <!-- Promotor -->
-                <div class="relative">
+                <!-- Promotor — select fijo con lista de vendedores -->
+                <div>
                     <label for="promotor" class="block text-sm font-semibold text-gray-700 mb-1.5">
-                        Promotor / Vendedor
+                        Vendedor
                     </label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
@@ -106,13 +106,39 @@
                                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                             </svg>
                         </div>
-                        <input type="text" id="promotor" name="promotor" required
-                            placeholder="Escribe para buscar o añadir..." autocomplete="off"
-                            class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition text-base">
+                        <select id="promotor" name="promotor" required
+                            class="w-full pl-11 pr-10 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition appearance-none bg-white text-base">
+                            <option value="" disabled selected>Seleccione un vendedor</option>
+                            <option value="ALEIDY COLINA">Aleidy Colina</option>
+                            <option value="DAVID LINARES">David Linares</option>
+                            <option value="DIONERGI GUERRERO">Dionergi Guerrero</option>
+                            <option value="DIOMIRA ROSALES">Diomira Rosales</option>
+                            <option value="EDWIN BRITO">Edwin Brito</option>
+                            <option value="GABRIELA PARRA">Gabriela Parra</option>
+                            <option value="GILBERT RODRIGUEZ">Gilbert Rodriguez</option>
+                            <option value="JESUS FERREIRA">Jesus Ferreira</option>
+                            <option value="JORGE VELASQUEZ">Jorge Velasquez</option>
+                            <option value="JOSE DEL ROSARIO">Jose Del Rosario</option>
+                            <option value="LUIS FLORES">Luis Flores</option>
+                            <option value="MARCOS VIDAL">Marcos Vidal</option>
+                            <option value="MARIO BIGOTT">Mario Bigott</option>
+                            <option value="OWER ABREU">Ower Abreu</option>
+                            <option value="PIERO FIGUEROA">Piero Figueroa</option>
+                            <option value="RAFAEL GARCÍA">Rafael García</option>
+                            <option value="SAULO RIVERO">Saulo Rivero</option>
+                            <option value="SURASKY VILLAFAÑA">Surasky Villafaña</option>
+                            <option value="TORCOROMA VENCE">Torcoroma Vence</option>
+                            <option value="VANESSA VARGAS">Vanessa Vargas</option>
+                            <option value="WILMER DUQUE">Wilmer Duque</option>
+                            <option value="YINIBER PEREIRA">Yiniber Pereira</option>
+                            <option value="YORKEN MAESTRE">Yorken Maestre</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
+                        </div>
                     </div>
-                    <ul id="sugerencias-promotor"
-                        class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto hidden no-scrollbar divide-y divide-gray-100">
-                    </ul>
                 </div>
 
                 <!-- Cliente -->
@@ -323,8 +349,6 @@
     // REFERENCIAS DOM
     // ──────────────────────────────────────────────────────────────
     const form             = document.getElementById('popForm');
-    const inputPromotor    = document.getElementById('promotor');
-    const listaSugerencias = document.getElementById('sugerencias-promotor');
     const btnSubmit        = document.getElementById('btnSubmit');
     const fotosGrid        = document.getElementById('fotos-grid');
     const contadorFotos    = document.getElementById('contador-fotos');
@@ -332,49 +356,6 @@
     const loadingStatus    = document.getElementById('loadingStatus');
 
     let fotosArray = [];   // Array en memoria con los archivos a subir
-
-    // ──────────────────────────────────────────────────────────────
-    // AUTOCOMPLETADO PROMOTOR
-    // ──────────────────────────────────────────────────────────────
-    let debounceTimer;
-
-    inputPromotor.addEventListener('input', (e) => {
-        clearTimeout(debounceTimer);
-        const query = e.target.value.trim();
-        if (query.length < 2) { listaSugerencias.classList.add('hidden'); return; }
-
-        debounceTimer = setTimeout(async () => {
-            const { data, error } = await sb
-                .from('sorteo_promotores')
-                .select('nombre')
-                .ilike('nombre', `%${query}%`)
-                .limit(5);
-
-            if (!error && data?.length > 0) {
-                listaSugerencias.innerHTML = '';
-                data.forEach(p => {
-                    const li = document.createElement('li');
-                    li.textContent = p.nombre;
-                    li.className = 'px-4 py-3 cursor-pointer hover:bg-brand-50 active:bg-brand-100 text-gray-700 text-base';
-                    li.addEventListener('click', () => {
-                        inputPromotor.value = p.nombre;
-                        listaSugerencias.classList.add('hidden');
-                    });
-                    listaSugerencias.appendChild(li);
-                });
-                listaSugerencias.classList.remove('hidden');
-            } else {
-                listaSugerencias.classList.add('hidden');
-            }
-        }, 300);
-    });
-
-    // Cerrar sugerencias al hacer clic fuera
-    document.addEventListener('click', (e) => {
-        if (!inputPromotor.contains(e.target) && !listaSugerencias.contains(e.target)) {
-            listaSugerencias.classList.add('hidden');
-        }
-    });
 
     // ──────────────────────────────────────────────────────────────
     // FOTOS — DOS INPUTS SEPARADOS (cámara nativa + galería)
@@ -449,7 +430,7 @@
         e.preventDefault();
 
         // 1. Recoger valores
-        const promotorNombre = inputPromotor.value.trim().toUpperCase();
+        const promotorNombre = document.getElementById('promotor').value;  // ya viene en MAYÚSCULAS del value del option
         const cliente        = document.getElementById('cliente').value.trim();
         const estado         = document.getElementById('estado').value;
         const materiales     = Array.from(document.querySelectorAll('.mat-check:checked'))
