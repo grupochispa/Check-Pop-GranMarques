@@ -10,7 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <script>
@@ -20,7 +19,7 @@
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
                         brand: {
-                            50: '#f0f9ff', 100: '#e0f2fe', 600: '#0284c7', 
+                            50: '#f0f9ff', 100: '#e0f2fe', 600: '#0284c7',
                             700: '#0369a1', 800: '#075985', 900: '#0c4a6e',
                         }
                     }
@@ -28,30 +27,51 @@
             }
         }
     </script>
+
     <style>
+        /* ─── Chips POP ─────────────────────────────────────────── */
         .pop-chip input[type="checkbox"] { display: none; }
         .pop-chip label {
-            display: inline-flex; align-items: center; cursor: pointer; transition: all 0.2s ease;
+            display: inline-flex; align-items: center;
+            cursor: pointer; transition: all 0.2s ease;
         }
         .pop-chip input[type="checkbox"]:checked + label {
             background-color: #0284c7; color: white; border-color: #0284c7;
-            box-shadow: 0 4px 6px -1px rgba(2, 132, 199, 0.3);
+            box-shadow: 0 4px 6px -1px rgba(2,132,199,0.3);
         }
-        
+
+        /* ─── Scrollbar ─────────────────────────────────────────── */
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /*
+         * ─── BUG #2 CORREGIDO ────────────────────────────────────
+         * El modal tenía class="... hidden flex ..." en Tailwind.
+         * 'hidden' genera display:none !important que cancelaba 'flex'.
+         * Solución: manejar display con CSS puro y la clase .activo
+         */
+        #loadingModal {
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        #loadingModal.activo {
+            display: flex;
+        }
     </style>
 </head>
-<body class="bg-brand-50 text-brand-900 font-sans antialiased min-h-screen pb-10 relative">
+<body class="bg-brand-50 text-brand-900 font-sans antialiased min-h-screen pb-10">
 
+    <!-- ═══ HEADER ════════════════════════════════════════════════ -->
     <header class="bg-white shadow-sm sticky top-0 z-40 border-b border-gray-100">
         <nav class="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <svg class="w-7 h-7 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
                 <span class="text-xl font-extrabold tracking-tighter text-brand-900">
-                    GranMarques<span class="text-brand-600"> Check</span>
+                    GranMarques<span class="text-brand-600">Check</span>
                 </span>
             </div>
             <div class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
@@ -60,63 +80,100 @@
         </nav>
     </header>
 
+    <!-- ═══ MAIN ══════════════════════════════════════════════════ -->
     <main class="max-w-lg mx-auto p-4">
-        
+
         <div class="mb-6">
             <h1 class="text-2xl font-extrabold tracking-tight">Registro de Visita</h1>
             <p class="text-gray-600 text-sm mt-1">Complete los detalles y adjunte evidencias.</p>
         </div>
 
         <form id="popForm" class="space-y-5">
-            
+
+            <!-- ── Datos Generales ─────────────────────────────── -->
             <section class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-                <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-2">Datos Generales</h2>
-                
+                <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider">Datos Generales</h2>
+
+                <!-- Promotor -->
                 <div class="relative">
-                    <label for="promotor" class="block text-sm font-semibold text-gray-700 mb-1.5">Promotor / Vendedor</label>
+                    <label for="promotor" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                        Promotor / Vendedor
+                    </label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                            </svg>
                         </div>
-                        <input type="text" id="promotor" name="promotor" required placeholder="Escribe para buscar o añadir..." autocomplete="off"
-                            class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition duration-150 text-base">
+                        <input type="text" id="promotor" name="promotor" required
+                            placeholder="Escribe para buscar o añadir..." autocomplete="off"
+                            class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition text-base">
                     </div>
-                    <ul id="sugerencias-promotor" class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto hidden no-scrollbar divide-y divide-gray-100"></ul>
+                    <ul id="sugerencias-promotor"
+                        class="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-xl shadow-lg max-h-48 overflow-y-auto hidden no-scrollbar divide-y divide-gray-100">
+                    </ul>
                 </div>
 
+                <!-- Cliente -->
                 <div>
-                    <label for="cliente" class="block text-sm font-semibold text-gray-700 mb-1.5">Cliente / Establecimiento</label>
+                    <label for="cliente" class="block text-sm font-semibold text-gray-700 mb-1.5">
+                        Cliente / Establecimiento
+                    </label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path></svg>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                            </svg>
                         </div>
                         <input type="text" id="cliente" name="cliente" required placeholder="Nombre del local"
-                            class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition duration-150 text-base">
+                            class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition text-base">
                     </div>
                 </div>
 
+                <!-- Estado -->
                 <div>
                     <label for="estado" class="block text-sm font-semibold text-gray-700 mb-1.5">Estado</label>
                     <div class="relative">
                         <select id="estado" name="estado" required
-                            class="w-full pl-4 pr-10 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition duration-150 appearance-none bg-white text-base">
+                            class="w-full pl-4 pr-10 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 appearance-none bg-white text-base">
                             <option value="" disabled selected>Seleccione un estado</option>
-                            <option value="Amazonas">Amazonas</option><option value="Anzoátegui">Anzoátegui</option><option value="Apure">Apure</option>
-                            <option value="Aragua">Aragua</option><option value="Barinas">Barinas</option><option value="Bolívar">Bolívar</option>
-                            <option value="Carabobo">Carabobo</option><option value="Cojedes">Cojedes</option><option value="Delta Amacuro">Delta Amacuro</option>
-                            <option value="Distrito Capital">Distrito Capital</option><option value="Falcón">Falcón</option><option value="Guárico">Guárico</option>
-                            <option value="Lara">Lara</option><option value="La Guaira">La Guaira (Vargas)</option><option value="Mérida">Mérida</option>
-                            <option value="Miranda">Miranda</option><option value="Monagas">Monagas</option><option value="Nueva Esparta">Nueva Esparta</option>
-                            <option value="Portuguesa">Portuguesa</option><option value="Sucre">Sucre</option><option value="Táchira">Táchira</option>
-                            <option value="Trujillo">Trujillo</option><option value="Yaracuy">Yaracuy</option><option value="Zulia">Zulia</option>
+                            <option value="Amazonas">Amazonas</option>
+                            <option value="Anzoátegui">Anzoátegui</option>
+                            <option value="Apure">Apure</option>
+                            <option value="Aragua">Aragua</option>
+                            <option value="Barinas">Barinas</option>
+                            <option value="Bolívar">Bolívar</option>
+                            <option value="Carabobo">Carabobo</option>
+                            <option value="Cojedes">Cojedes</option>
+                            <option value="Delta Amacuro">Delta Amacuro</option>
+                            <option value="Distrito Capital">Distrito Capital</option>
+                            <option value="Falcón">Falcón</option>
+                            <option value="Guárico">Guárico</option>
+                            <option value="Lara">Lara</option>
+                            <option value="La Guaira">La Guaira (Vargas)</option>
+                            <option value="Mérida">Mérida</option>
+                            <option value="Miranda">Miranda</option>
+                            <option value="Monagas">Monagas</option>
+                            <option value="Nueva Esparta">Nueva Esparta</option>
+                            <option value="Portuguesa">Portuguesa</option>
+                            <option value="Sucre">Sucre</option>
+                            <option value="Táchira">Táchira</option>
+                            <option value="Trujillo">Trujillo</option>
+                            <option value="Yaracuy">Yaracuy</option>
+                            <option value="Zulia">Zulia</option>
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                            </svg>
                         </div>
                     </div>
                 </div>
             </section>
 
+            <!-- ── Material POP ───────────────────────────────── -->
             <section class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-3">Material POP</h2>
                 <div class="flex flex-wrap gap-2 pop-chip">
@@ -143,36 +200,56 @@
                 </div>
             </section>
 
+            <!-- ── Evidencias Fotográficas ─────────────────────── -->
             <section class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <div class="flex items-center justify-between mb-3">
                     <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider">Evidencias Fotográficas</h2>
-                    <span id="contador-fotos" class="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">0 fotos</span>
+                    <span id="contador-fotos"
+                        class="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
+                        0 fotos
+                    </span>
                 </div>
-                
-                <div class="space-y-4">
-                    <div id="fotos-grid" class="grid grid-cols-3 gap-3 hidden">
-                        </div>
 
-                    <button type="button" id="btnAddPhoto" 
+                <div class="space-y-4">
+                    <div id="fotos-grid" class="grid grid-cols-3 gap-3 hidden"></div>
+
+                    <button type="button" id="btnAddPhoto"
                         class="w-full flex items-center justify-center gap-2.5 px-4 py-4 border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-brand-400 hover:bg-brand-50 transition active:bg-brand-100">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" class="hidden"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
                         <span class="font-semibold" id="txtBtnPhoto">Tomar Foto</span>
                     </button>
 
-                    <input type="file" id="fotoInput" accept="image/*" capture="environment" multiple class="hidden">
+                    <!-- Sin 'capture' para permitir también galería en móvil -->
+                    <input type="file" id="fotoInput" accept="image/*" multiple class="hidden">
                 </div>
             </section>
 
+            <!-- ── Botón Guardar ──────────────────────────────── -->
             <div class="pt-2 sticky bottom-4 z-30">
-                <button type="submit" id="btnSubmit" 
-                    class="w-full flex items-center justify-center bg-brand-600 hover:bg-brand-700 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-brand-200 transition duration-150 active:scale-[0.98]">
+                <button type="submit" id="btnSubmit"
+                    class="w-full flex items-center justify-center gap-3 bg-brand-600 hover:bg-brand-700 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-brand-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                            d="M5 13l4 4L19 7"/>
+                    </svg>
                     <span>Guardar Registro</span>
                 </button>
             </div>
+
         </form>
     </main>
 
-    <div id="loadingModal" class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm z-[999] hidden flex items-center justify-center transition-opacity duration-300">
+    <!-- ═══ MODAL DE CARGA ════════════════════════════════════════
+         BUG CORREGIDO: Ya no usa class="hidden flex" (conflicto Tailwind).
+         Ahora usa CSS puro + clase .activo para mostrar/ocultar.
+    ═════════════════════════════════════════════════════════════ -->
+    <div id="loadingModal"
+        class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm z-[999]">
         <div class="bg-white p-8 rounded-2xl flex flex-col items-center shadow-2xl w-10/12 max-w-sm text-center">
             <div class="w-14 h-14 border-4 border-brand-100 border-t-brand-600 rounded-full animate-spin mb-4"></div>
             <h3 class="text-xl font-extrabold text-gray-900 mb-1">Procesando...</h3>
@@ -180,249 +257,277 @@
         </div>
     </div>
 
-    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[1000] transform -translate-y-24 opacity-0 transition-all duration-300 ease-out w-11/12 max-w-sm">
+    <!-- ═══ TOAST ═════════════════════════════════════════════════ -->
+    <div id="toast"
+        class="fixed top-5 left-1/2 -translate-x-1/2 z-[1000] -translate-y-24 opacity-0 transition-all duration-300 ease-out w-11/12 max-w-sm pointer-events-none">
         <div class="flex items-center gap-3 bg-gray-900 text-white px-5 py-4 rounded-xl shadow-2xl">
-            <div id="toastIconSuccess" class="hidden text-green-400">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+            <div id="toastIconSuccess" class="hidden shrink-0 text-green-400">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
+                </svg>
             </div>
-            <div id="toastIconError" class="hidden text-red-400">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l18 18"></path></svg>
+            <div id="toastIconError" class="hidden shrink-0 text-red-400">
+                <!-- BUG CORREGIDO: path del ícono X estaba mal ("l18 18" → "l12 12") -->
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
             </div>
             <p id="toastMessage" class="font-medium text-sm leading-snug"></p>
         </div>
     </div>
 
+    <!-- ═══════════════════════════════════════════════════════════
+         JAVASCRIPT — TODOS LOS BUGS CORREGIDOS
+    ════════════════════════════════════════════════════════════ -->
     <script>
-        // --- CONFIGURACIÓN SUPABASE ---
-        const SUPABASE_URL = 'https://zgbsrbjtjnozpzxifpua.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnYnNyYmp0am5venB6eGlmcHVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNjI5MjUsImV4cCI6MjA2OTkzODkyNX0.zHVKe6Ab73PFhQqD3Au94x1Z71hMyRpxE1PCWP8-QTI';
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    // ──────────────────────────────────────────────────────────────
+    // BUG #1 CORREGIDO (CRÍTICO)
+    // ANTES:  const supabase = supabase.createClient(...)
+    //         → La variable se llamaba igual que el módulo del CDN
+    //           (window.supabase), causando un ReferenceError o un
+    //           bucle de auto-referencia antes de ejecutarse.
+    //
+    // AHORA:  Extraemos createClient de window.supabase y nombramos
+    //         al cliente "sb" para evitar cualquier conflicto.
+    // ──────────────────────────────────────────────────────────────
+    const SUPABASE_URL      = 'https://zgbsrbjtjnozpzxifpua.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnYnNyYmp0am5venB6eGlmcHVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNjI5MjUsImV4cCI6MjA2OTkzODkyNX0.zHVKe6Ab73PFhQqD3Au94x1Z71hMyRpxE1PCWP8-QTI';
 
-        // --- ELEMENTOS DEL DOM ---
-        const form = document.getElementById('popForm');
-        const inputPromotor = document.getElementById('promotor');
-        const listaSugerencias = document.getElementById('sugerencias-promotor');
-        const btnSubmit = document.getElementById('btnSubmit');
-        
-        // Elementos de Fotos
-        const btnAddPhoto = document.getElementById('btnAddPhoto');
-        const fotoInput = document.getElementById('fotoInput');
-        const fotosGrid = document.getElementById('fotos-grid');
-        const contadorFotos = document.getElementById('contador-fotos');
-        const txtBtnPhoto = document.getElementById('txtBtnPhoto');
-        
-        // Elementos del Modal
-        const loadingModal = document.getElementById('loadingModal');
-        const loadingStatus = document.getElementById('loadingStatus');
+    const { createClient } = window.supabase;   // ← extraer del CDN
+    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);  // ← cliente "sb"
 
-        // Almacén temporal de archivos de imagen
-        let fotosArray = [];
+    // ──────────────────────────────────────────────────────────────
+    // REFERENCIAS DOM
+    // ──────────────────────────────────────────────────────────────
+    const form             = document.getElementById('popForm');
+    const inputPromotor    = document.getElementById('promotor');
+    const listaSugerencias = document.getElementById('sugerencias-promotor');
+    const btnSubmit        = document.getElementById('btnSubmit');
+    const btnAddPhoto      = document.getElementById('btnAddPhoto');
+    const fotoInput        = document.getElementById('fotoInput');
+    const fotosGrid        = document.getElementById('fotos-grid');
+    const contadorFotos    = document.getElementById('contador-fotos');
+    const txtBtnPhoto      = document.getElementById('txtBtnPhoto');
+    const loadingModal     = document.getElementById('loadingModal');
+    const loadingStatus    = document.getElementById('loadingStatus');
 
-        // --- LÓGICA DE AUTOCOMPLETADO (PROMOTOR) ---
-        let debounceTimer;
-        inputPromotor.addEventListener('input', (e) => {
-            clearTimeout(debounceTimer);
-            const query = e.target.value.trim();
-            if (query.length < 2) {
-                listaSugerencias.classList.add('hidden');
-                return;
-            }
-            debounceTimer = setTimeout(async () => {
-                const { data, error } = await supabase
-                    .from('sorteo_promotores')
-                    .select('nombre')
-                    .ilike('nombre', `%${query}%`)
-                    .limit(5);
+    let fotosArray = [];   // Array en memoria con los archivos a subir
 
-                if (!error && data && data.length > 0) {
-                    listaSugerencias.innerHTML = '';
-                    data.forEach(promotor => {
-                        const li = document.createElement('li');
-                        li.textContent = promotor.nombre;
-                        li.className = 'px-4 py-3 cursor-pointer hover:bg-brand-50 active:bg-brand-100 text-gray-700 text-base';
-                        li.addEventListener('click', () => {
-                            inputPromotor.value = promotor.nombre;
-                            listaSugerencias.classList.add('hidden');
-                        });
-                        listaSugerencias.appendChild(li);
+    // ──────────────────────────────────────────────────────────────
+    // AUTOCOMPLETADO PROMOTOR
+    // ──────────────────────────────────────────────────────────────
+    let debounceTimer;
+
+    inputPromotor.addEventListener('input', (e) => {
+        clearTimeout(debounceTimer);
+        const query = e.target.value.trim();
+        if (query.length < 2) { listaSugerencias.classList.add('hidden'); return; }
+
+        debounceTimer = setTimeout(async () => {
+            const { data, error } = await sb
+                .from('sorteo_promotores')
+                .select('nombre')
+                .ilike('nombre', `%${query}%`)
+                .limit(5);
+
+            if (!error && data?.length > 0) {
+                listaSugerencias.innerHTML = '';
+                data.forEach(p => {
+                    const li = document.createElement('li');
+                    li.textContent = p.nombre;
+                    li.className = 'px-4 py-3 cursor-pointer hover:bg-brand-50 active:bg-brand-100 text-gray-700 text-base';
+                    li.addEventListener('click', () => {
+                        inputPromotor.value = p.nombre;
+                        listaSugerencias.classList.add('hidden');
                     });
-                    listaSugerencias.classList.remove('hidden');
-                } else {
-                    listaSugerencias.classList.add('hidden');
-                }
-            }, 300);
-        });
-
-        document.addEventListener('click', (e) => {
-            if (e.target !== inputPromotor && e.target !== listaSugerencias) {
-                listaSugerencias.classList.add('hidden');
-            }
-        });
-
-        // --- LÓGICA MULTI-FOTOS CON PREVIEW ---
-        btnAddPhoto.addEventListener('click', () => {
-            fotoInput.click();
-        });
-
-        fotoInput.addEventListener('change', (e) => {
-            const files = e.target.files;
-            if (!files || files.length === 0) return;
-
-            // Recorremos los archivos (por si eligen varios de la galería)
-            for (let i = 0; i < files.length; i++) {
-                fotosArray.push(files[i]);
-            }
-            
-            actualizarUIFotos();
-            fotoInput.value = ''; // Limpiar el input para permitir misma foto
-        });
-
-        function actualizarUIFotos() {
-            fotosGrid.innerHTML = '';
-            
-            if (fotosArray.length > 0) {
-                fotosGrid.classList.remove('hidden');
-                txtBtnPhoto.textContent = 'Añadir otra foto';
-                contadorFotos.textContent = `${fotosArray.length} foto${fotosArray.length > 1 ? 's' : ''}`;
-                contadorFotos.classList.replace('text-gray-500', 'text-brand-600');
-                contadorFotos.classList.replace('bg-gray-100', 'bg-brand-100');
+                    listaSugerencias.appendChild(li);
+                });
+                listaSugerencias.classList.remove('hidden');
             } else {
-                fotosGrid.classList.add('hidden');
-                txtBtnPhoto.textContent = 'Tomar Foto';
-                contadorFotos.textContent = '0 fotos';
-                contadorFotos.classList.replace('text-brand-600', 'text-gray-500');
-                contadorFotos.classList.replace('bg-brand-100', 'bg-gray-100');
+                listaSugerencias.classList.add('hidden');
             }
+        }, 300);
+    });
 
-            // Crear los recuadros de preview dinámicamente
-            fotosArray.forEach((file, index) => {
-                const reader = new FileReader();
-                reader.onload = function(event) {
-                    const div = document.createElement('div');
-                    div.className = 'relative rounded-xl overflow-hidden shadow-sm border border-gray-200 aspect-square bg-gray-50';
-                    div.innerHTML = `
-                        <img src="${event.target.result}" class="w-full h-full object-cover">
-                        <button type="button" class="btn-eliminar-foto absolute top-1 right-1 bg-red-500 text-white p-1.5 rounded-full shadow-lg hover:bg-red-600 active:scale-90 transition" data-index="${index}">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l18 18"></path></svg>
-                        </button>
-                    `;
-                    fotosGrid.appendChild(div);
+    // Cerrar sugerencias al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        if (!inputPromotor.contains(e.target) && !listaSugerencias.contains(e.target)) {
+            listaSugerencias.classList.add('hidden');
+        }
+    });
 
-                    // Asignar evento de eliminación al botón creado
-                    div.querySelector('.btn-eliminar-foto').addEventListener('click', function() {
-                        const idx = parseInt(this.getAttribute('data-index'));
-                        fotosArray.splice(idx, 1);
-                        actualizarUIFotos(); // Volver a renderizar
-                    });
-                }
-                reader.readAsDataURL(file);
-            });
+    // ──────────────────────────────────────────────────────────────
+    // FOTOS — AGREGAR Y RENDERIZAR PREVIEW
+    // ──────────────────────────────────────────────────────────────
+    btnAddPhoto.addEventListener('click', () => fotoInput.click());
+
+    fotoInput.addEventListener('change', (e) => {
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
+        fotosArray.push(...files);
+        renderFotos();
+        fotoInput.value = '';   // Permite seleccionar el mismo archivo de nuevo
+    });
+
+    function renderFotos() {
+        fotosGrid.innerHTML = '';
+
+        if (fotosArray.length > 0) {
+            fotosGrid.classList.remove('hidden');
+            txtBtnPhoto.textContent = 'Añadir otra foto';
+            contadorFotos.textContent = `${fotosArray.length} foto${fotosArray.length !== 1 ? 's' : ''}`;
+            contadorFotos.className = 'text-xs font-semibold text-brand-600 bg-brand-100 px-2 py-1 rounded-md';
+        } else {
+            fotosGrid.classList.add('hidden');
+            txtBtnPhoto.textContent = 'Tomar Foto';
+            contadorFotos.textContent = '0 fotos';
+            contadorFotos.className = 'text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md';
         }
 
-        // --- ENVÍO DEL FORMULARIO Y MODAL ---
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            if (fotosArray.length === 0) {
-                showToast('Por favor, tome al menos una foto de evidencia.', 'error');
-                return;
-            }
-
-            mostrarModal(true);
-
-            try {
-                actualizarTextoModal('Verificando promotor...');
-                const promotorNombre = inputPromotor.value.trim().toUpperCase();
-                await supabase
-                    .from('sorteo_promotores')
-                    .upsert([{ nombre: promotorNombre }], { onConflict: 'nombre' });
-
-                actualizarTextoModal('Subiendo fotos (0/' + fotosArray.length + ')...');
-                const rutasFotosSubidas = [];
-                
-                for (let i = 0; i < fotosArray.length; i++) {
-                    const file = fotosArray[i];
-                    const fileExt = file.name.split('.').pop();
-                    const randomStr = Math.random().toString(36).substring(2, 8);
-                    const fileName = `${Date.now()}_${randomStr}_evidencia.${fileExt}`;
-                    
-                    const { data: storageData, error: storageError } = await supabase.storage
-                        .from('evidencias')
-                        .upload(fileName, file);
-
-                    if (storageError) throw new Error(`Error al subir la foto #${i + 1}.`);
-                    
-                    rutasFotosSubidas.push(storageData.path);
-                    actualizarTextoModal(`Subiendo fotos (${i + 1}/${fotosArray.length})...`);
-                }
-
-                actualizarTextoModal('Guardando registro en la base de datos...');
-                
-                const cliente = document.getElementById('cliente').value;
-                const estado = document.getElementById('estado').value;
-                const materiales = Array.from(document.querySelectorAll('.mat-check:checked')).map(cb => cb.value);
-
-                if (materiales.length === 0) throw new Error('Seleccione al menos un material POP.');
-                if (!estado) throw new Error('Debe seleccionar un estado.');
-
-                const { error: dbError } = await supabase
-                    .from('sorteo_registros')
-                    .insert([{
-                        promotor_nombre: promotorNombre,
-                        cliente_nombre: cliente,
-                        estado: estado,
-                        materiales_entregados: materiales,
-                        fotos_urls: rutasFotosSubidas
-                    }]);
-
-                if (dbError) throw new Error('Error al guardar el registro en la base de datos.');
-
-                mostrarModal(false);
-                showToast('Visita registrada con éxito', 'success');
-                
-                // Limpiar formulario
-                form.reset();
-                fotosArray = [];
-                actualizarUIFotos();
-
-            } catch (err) {
-                mostrarModal(false);
-                showToast(err.message, 'error');
-            }
+        fotosArray.forEach((file, index) => {
+            const reader = new FileReader();
+            reader.onload = ({ target }) => {
+                const div = document.createElement('div');
+                div.className = 'relative rounded-xl overflow-hidden shadow-sm border border-gray-200 aspect-square bg-gray-50';
+                div.innerHTML = `
+                    <img src="${target.result}" class="w-full h-full object-cover" loading="lazy">
+                    <button type="button" data-idx="${index}"
+                        class="btn-del absolute top-1 right-1 bg-red-500 text-white p-1.5 rounded-full shadow-lg hover:bg-red-600 active:scale-90 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                    </button>
+                `;
+                fotosGrid.appendChild(div);
+                div.querySelector('.btn-del').addEventListener('click', function () {
+                    fotosArray.splice(parseInt(this.dataset.idx), 1);
+                    renderFotos();
+                });
+            };
+            reader.readAsDataURL(file);
         });
+    }
 
-        // --- FUNCIONES AUXILIARES (MODAL Y TOAST) ---
-        function mostrarModal(mostrar) {
-            if (mostrar) {
-                loadingModal.classList.remove('hidden');
-                btnSubmit.disabled = true;
-            } else {
-                loadingModal.classList.add('hidden');
-                btnSubmit.disabled = false;
-                loadingStatus.textContent = 'Iniciando subida de datos'; // reset text
+    // ──────────────────────────────────────────────────────────────
+    // ENVÍO DEL FORMULARIO
+    // BUG CORREGIDO: Validaciones ANTES de cualquier operación async
+    // BUG CORREGIDO: Guardar URLs públicas, no rutas internas
+    // ──────────────────────────────────────────────────────────────
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        // 1. Recoger valores
+        const promotorNombre = inputPromotor.value.trim().toUpperCase();
+        const cliente        = document.getElementById('cliente').value.trim();
+        const estado         = document.getElementById('estado').value;
+        const materiales     = Array.from(document.querySelectorAll('.mat-check:checked'))
+                                    .map(cb => cb.value);
+
+        // 2. Validar TODO antes de empezar (sin subir nada aún)
+        if (!promotorNombre)       return showToast('El campo Promotor es requerido.', 'error');
+        if (!cliente)              return showToast('El campo Cliente es requerido.', 'error');
+        if (!estado)               return showToast('Debe seleccionar un estado.', 'error');
+        if (materiales.length === 0) return showToast('Seleccione al menos un material POP.', 'error');
+        if (fotosArray.length === 0) return showToast('Tome al menos una foto de evidencia.', 'error');
+
+        setLoading(true, 'Verificando promotor...');
+
+        try {
+            // 3. Guardar promotor (upsert — inserta si no existe)
+            const { error: errPromotor } = await sb
+                .from('sorteo_promotores')
+                .upsert([{ nombre: promotorNombre }], { onConflict: 'nombre' });
+
+            if (errPromotor) console.warn('Advertencia promotores:', errPromotor.message);
+
+            // 4. Subir fotos al Storage y obtener URLs públicas
+            const urlsFotos = [];
+            for (let i = 0; i < fotosArray.length; i++) {
+                setLoading(true, `Subiendo foto ${i + 1} de ${fotosArray.length}...`);
+                const file     = fotosArray[i];
+                const ext      = (file.name.split('.').pop() || 'jpg').toLowerCase();
+                const fileName = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
+
+                const { data: stData, error: stError } = await sb.storage
+                    .from('evidencias')
+                    .upload(fileName, file, { cacheControl: '3600', upsert: false });
+
+                if (stError) throw new Error(`Error al subir foto #${i + 1}: ${stError.message}`);
+
+                // BUG CORREGIDO: obtener URL pública real, no solo la ruta
+                const { data: { publicUrl } } = sb.storage
+                    .from('evidencias')
+                    .getPublicUrl(stData.path);
+
+                urlsFotos.push(publicUrl);
             }
-        }
 
-        function actualizarTextoModal(texto) {
+            // 5. Insertar registro en la base de datos
+            setLoading(true, 'Guardando registro...');
+            const { error: dbError } = await sb
+                .from('sorteo_registros')
+                .insert([{
+                    promotor_nombre:       promotorNombre,
+                    cliente_nombre:        cliente,
+                    estado:                estado,
+                    materiales_entregados: materiales,   // text[] en Supabase
+                    fotos_urls:            urlsFotos     // text[] en Supabase
+                }]);
+
+            if (dbError) throw new Error(`Error en base de datos: ${dbError.message}`);
+
+            // 6. Éxito
+            setLoading(false);
+            showToast('¡Visita registrada con éxito!', 'success');
+            resetForm();
+
+        } catch (err) {
+            setLoading(false);
+            showToast(err.message, 'error');
+            console.error('Error al guardar:', err);
+        }
+    });
+
+    // ──────────────────────────────────────────────────────────────
+    // HELPERS
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * Muestra u oculta el modal de carga.
+     * BUG CORREGIDO: ya no usa classList add/remove 'hidden'+'flex'.
+     * Usa la clase CSS .activo que hace display:flex.
+     */
+    function setLoading(show, texto = 'Procesando...') {
+        if (show) {
+            loadingModal.classList.add('activo');
             loadingStatus.textContent = texto;
+            btnSubmit.disabled = true;
+        } else {
+            loadingModal.classList.remove('activo');
+            btnSubmit.disabled = false;
+            loadingStatus.textContent = 'Iniciando subida de datos';
         }
+    }
 
-        function showToast(message, type) {
-            const toast = document.getElementById('toast');
-            const msgEl = document.getElementById('toastMessage');
-            msgEl.textContent = message;
-            
-            document.getElementById('toastIconSuccess').classList.toggle('hidden', type !== 'success');
-            document.getElementById('toastIconError').classList.toggle('hidden', type !== 'error');
+    function showToast(message, type = 'error') {
+        const toast = document.getElementById('toast');
+        document.getElementById('toastMessage').textContent = message;
+        document.getElementById('toastIconSuccess').classList.toggle('hidden', type !== 'success');
+        document.getElementById('toastIconError').classList.toggle('hidden',   type !== 'error');
 
-            toast.classList.remove('-translate-y-24', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
+        toast.classList.remove('-translate-y-24', 'opacity-0');
+        toast.classList.add('translate-y-0', 'opacity-100');
+        setTimeout(() => {
+            toast.classList.remove('translate-y-0', 'opacity-100');
+            toast.classList.add('-translate-y-24', 'opacity-0');
+        }, 3500);
+    }
 
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('-translate-y-24', 'opacity-0');
-            }, 3500);
-        }
+    function resetForm() {
+        form.reset();
+        fotosArray = [];
+        renderFotos();
+    }
     </script>
 </body>
 </html>
