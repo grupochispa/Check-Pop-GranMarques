@@ -4,110 +4,104 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Gran Marqués - MarquesCheck PWA</title>
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: { sans: ['Inter', 'sans-serif'] },
                     colors: {
-                        brand: {
-                            50: '#f0f9ff', 100: '#e0f2fe', 600: '#0284c7',
-                            700: '#0369a1', 800: '#075985', 900: '#0c4a6e',
-                        }
+                        brand: { 50:'#f0f9ff',100:'#e0f2fe',600:'#0284c7',700:'#0369a1',800:'#075985',900:'#0c4a6e' }
                     }
                 }
             }
         }
     </script>
-
     <style>
-        /* ─── Chips POP ─────────────────────────────────────────── */
-        .pop-chip input[type="checkbox"] { display: none; }
-        .pop-chip label {
-            display: inline-flex; align-items: center;
-            cursor: pointer; transition: all 0.2s ease;
-        }
-        .pop-chip input[type="checkbox"]:checked + label {
-            background-color: #0284c7; color: white; border-color: #0284c7;
-            box-shadow: 0 4px 6px -1px rgba(2,132,199,0.3);
-        }
+        .pop-chip input[type="checkbox"] { display:none; }
+        .pop-chip label { display:inline-flex; align-items:center; cursor:pointer; transition:all 0.2s ease; }
+        .pop-chip input[type="checkbox"]:checked + label { background-color:#0284c7; color:white; border-color:#0284c7; box-shadow:0 4px 6px -1px rgba(2,132,199,0.3); }
 
-        /* ─── Scrollbar ─────────────────────────────────────────── */
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        #loadingModal { display:none; align-items:center; justify-content:center; }
+        #loadingModal.activo { display:flex; }
 
-        /*
-         * ─── BUG #2 CORREGIDO ────────────────────────────────────
-         * El modal tenía class="... hidden flex ..." en Tailwind.
-         * 'hidden' genera display:none !important que cancelaba 'flex'.
-         * Solución: manejar display con CSS puro y la clase .activo
-         */
-        #loadingModal {
-            display: none;
-            align-items: center;
-            justify-content: center;
+        #calcModal { display:none; align-items:flex-end; justify-content:center; }
+        #calcModal.activo { display:flex; }
+        #calcModalPanel { transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.32,0.72,0,1); }
+        #calcModal.activo #calcModalPanel { transform:translateY(0); }
+
+        #fabCalc {
+            position:fixed; bottom:24px; right:20px; z-index:50;
+            width:58px; height:58px; border-radius:50%;
+            background:linear-gradient(135deg,#f59e0b,#d97706);
+            color:white; box-shadow:0 8px 24px rgba(217,119,6,0.45);
+            display:flex; align-items:center; justify-content:center;
+            border:none; cursor:pointer; transition:transform 0.18s ease, box-shadow 0.18s ease;
         }
-        #loadingModal.activo {
-            display: flex;
+        #fabCalc:active { transform:scale(0.92); }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button { -webkit-appearance:none; margin:0; }
+        input[type=number] { -moz-appearance:textfield; }
+
+        /* SKU cards */
+        .sku-card { background:#fffbeb; border:1px solid #fde68a; border-radius:16px; padding:16px; position:relative; }
+        .sku-card + .sku-card { margin-top:12px; }
+        .sku-numero { position:absolute; top:12px; left:16px; font-size:11px; font-weight:800; color:#b45309; text-transform:uppercase; letter-spacing:0.05em; }
+        .sku-remove { position:absolute; top:10px; right:10px; width:26px; height:26px; background:#fee2e2; border-radius:50%; display:flex; align-items:center; justify-content:center; border:none; cursor:pointer; color:#ef4444; transition:background 0.15s; }
+        .sku-remove:hover { background:#fecaca; }
+
+        /* Resultado */
+        .res-card { background:linear-gradient(135deg,#fffbeb,#fff7ed); border:1px solid #fcd34d; border-radius:16px; padding:16px; margin-top:4px; }
+        .res-sku-block { border-left:3px solid #f59e0b; padding-left:12px; margin-bottom:12px; }
+        .res-sku-block:last-child { margin-bottom:0; }
+
+        /* Residuo opciones */
+        .residuo-opciones { display:none; }
+        .residuo-opciones.visible { display:block; }
+
+        select, input[type=text], input[type=number], textarea {
+            -webkit-appearance: none;
         }
     </style>
 </head>
-<body class="bg-brand-50 text-brand-900 font-sans antialiased min-h-screen pb-10">
+<body class="bg-brand-50 text-brand-900 font-sans antialiased min-h-screen pb-24">
 
-    <!-- ═══ HEADER ════════════════════════════════════════════════ -->
+    <!-- HEADER -->
     <header class="bg-white shadow-sm sticky top-0 z-40 border-b border-gray-100">
         <nav class="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center gap-2">
                 <svg class="w-7 h-7 text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <span class="text-xl font-extrabold tracking-tighter text-brand-900">
-                    GranMarques<span class="text-brand-600">Check</span>
-                </span>
+                <span class="text-xl font-extrabold tracking-tighter text-brand-900">GranMarques<span class="text-brand-600">Check</span></span>
             </div>
-            <div class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
-                GRAN MARQUÉS
-            </div>
+            <div class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">GRAN MARQUÉS</div>
         </nav>
     </header>
 
-    <!-- ═══ MAIN ══════════════════════════════════════════════════ -->
+    <!-- MAIN -->
     <main class="max-w-lg mx-auto p-4">
-
         <div class="mb-6">
             <h1 class="text-2xl font-extrabold tracking-tight">Registro de Visita</h1>
             <p class="text-gray-600 text-sm mt-1">Complete los detalles y adjunte evidencias.</p>
         </div>
 
         <form id="popForm" class="space-y-5">
-
-            <!-- ── Datos Generales ─────────────────────────────── -->
+            <!-- Datos Generales -->
             <section class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
                 <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider">Datos Generales</h2>
-
-                <!-- Promotor — select fijo con lista de vendedores -->
                 <div>
-                    <label for="promotor" class="block text-sm font-semibold text-gray-700 mb-1.5">
-                        Vendedor
-                    </label>
+                    <label for="promotor" class="block text-sm font-semibold text-gray-700 mb-1.5">Vendedor</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                            </svg>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
                         </div>
-                        <select id="promotor" name="promotor" required
-                            class="w-full pl-11 pr-10 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition appearance-none bg-white text-base">
+                        <select id="promotor" name="promotor" required class="w-full pl-11 pr-10 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition appearance-none bg-white text-base">
                             <option value="" disabled selected>Seleccione un vendedor</option>
                             <option value="ALEIDY COLINA">Aleidy Colina</option>
                             <option value="DAVID LINARES">David Linares</option>
@@ -133,414 +127,692 @@
                             <option value="YINIBER PEREIRA">Yiniber Pereira</option>
                             <option value="YORKEN MAESTRE">Yorken Maestre</option>
                         </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
                     </div>
                 </div>
-
-                <!-- Cliente -->
                 <div>
-                    <label for="cliente" class="block text-sm font-semibold text-gray-700 mb-1.5">
-                        Cliente / Establecimiento
-                    </label>
+                    <label for="cliente" class="block text-sm font-semibold text-gray-700 mb-1.5">Cliente / Establecimiento</label>
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                            </svg>
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
                         </div>
-                        <input type="text" id="cliente" name="cliente" required placeholder="Nombre del local"
-                            class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition text-base">
+                        <input type="text" id="cliente" name="cliente" required placeholder="Nombre del local" class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition text-base">
                     </div>
                 </div>
-
-                <!-- Estado -->
                 <div>
                     <label for="estado" class="block text-sm font-semibold text-gray-700 mb-1.5">Estado</label>
                     <div class="relative">
-                        <select id="estado" name="estado" required
-                            class="w-full pl-4 pr-10 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 appearance-none bg-white text-base">
+                        <select id="estado" name="estado" required class="w-full pl-4 pr-10 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 appearance-none bg-white text-base">
                             <option value="" disabled selected>Seleccione un estado</option>
-                            <option value="Amazonas">Amazonas</option>
-                            <option value="Anzoátegui">Anzoátegui</option>
-                            <option value="Apure">Apure</option>
-                            <option value="Aragua">Aragua</option>
-                            <option value="Barinas">Barinas</option>
-                            <option value="Bolívar">Bolívar</option>
-                            <option value="Carabobo">Carabobo</option>
-                            <option value="Cojedes">Cojedes</option>
-                            <option value="Delta Amacuro">Delta Amacuro</option>
-                            <option value="Distrito Capital">Distrito Capital</option>
-                            <option value="Falcón">Falcón</option>
-                            <option value="Guárico">Guárico</option>
-                            <option value="Lara">Lara</option>
-                            <option value="La Guaira">La Guaira (Vargas)</option>
-                            <option value="Mérida">Mérida</option>
-                            <option value="Miranda">Miranda</option>
-                            <option value="Monagas">Monagas</option>
-                            <option value="Nueva Esparta">Nueva Esparta</option>
-                            <option value="Portuguesa">Portuguesa</option>
-                            <option value="Sucre">Sucre</option>
-                            <option value="Táchira">Táchira</option>
-                            <option value="Trujillo">Trujillo</option>
-                            <option value="Yaracuy">Yaracuy</option>
-                            <option value="Zulia">Zulia</option>
+                            <option>Amazonas</option><option>Anzoátegui</option><option>Apure</option><option>Aragua</option><option>Barinas</option><option>Bolívar</option><option>Carabobo</option><option>Cojedes</option><option>Delta Amacuro</option><option>Distrito Capital</option><option>Falcón</option><option>Guárico</option><option>Lara</option><option value="La Guaira">La Guaira (Vargas)</option><option>Mérida</option><option>Miranda</option><option>Monagas</option><option>Nueva Esparta</option><option>Portuguesa</option><option>Sucre</option><option>Táchira</option><option>Trujillo</option><option>Yaracuy</option><option>Zulia</option>
                         </select>
-                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                            </svg>
-                        </div>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
                     </div>
                 </div>
             </section>
 
-            <!-- ── Material POP ───────────────────────────────── -->
+            <!-- Material POP -->
             <section class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-3">Material POP</h2>
                 <div class="flex flex-wrap gap-2 pop-chip">
-                    <div>
-                        <input type="checkbox" id="mat_cenefa" value="CENEFA" class="mat-check">
-                        <label for="mat_cenefa" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-brand-50">CENEFA</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="mat_hablador" value="HABLADOR" class="mat-check">
-                        <label for="mat_hablador" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-brand-50">HABLADOR</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="mat_afiche" value="AFICHE" class="mat-check">
-                        <label for="mat_afiche" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-brand-50">AFICHE</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="mat_dangler" value="DANGLER" class="mat-check">
-                        <label for="mat_dangler" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-brand-50">DANGLER</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="mat_rompe" value="ROMPE TRAFICO" class="mat-check">
-                        <label for="mat_rompe" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-brand-50">ROMPE TRAFICO</label>
-                    </div>
+                    <div><input type="checkbox" id="mat_cenefa" value="CENEFA" class="mat-check"><label for="mat_cenefa" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-brand-50">CENEFA</label></div>
+                    <div><input type="checkbox" id="mat_hablador" value="HABLADOR" class="mat-check"><label for="mat_hablador" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-brand-50">HABLADOR</label></div>
+                    <div><input type="checkbox" id="mat_afiche" value="AFICHE" class="mat-check"><label for="mat_afiche" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-brand-50">AFICHE</label></div>
+                    <div><input type="checkbox" id="mat_dangler" value="DANGLER" class="mat-check"><label for="mat_dangler" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-brand-50">DANGLER</label></div>
+                    <div><input type="checkbox" id="mat_rompe" value="ROMPE TRAFICO" class="mat-check"><label for="mat_rompe" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium hover:bg-brand-50">ROMPE TRAFICO</label></div>
                 </div>
             </section>
 
-            <!-- ── Evidencias Fotográficas ─────────────────────── -->
+            <!-- Evidencias -->
             <section class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
                 <div class="flex items-center justify-between mb-3">
                     <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider">Evidencias Fotográficas</h2>
-                    <span id="contador-fotos"
-                        class="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">
-                        0 fotos
-                    </span>
+                    <span id="contador-fotos" class="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">0 fotos</span>
                 </div>
-
                 <div class="space-y-4">
-                    <!-- Preview grid -->
                     <div id="fotos-grid" class="grid grid-cols-3 gap-3 hidden"></div>
-
-                    <!--
-                        SOLUCIÓN CÁMARA:
-                        Dos inputs separados porque en iOS/Android mezclar
-                        capture="environment" con multiple rompe la cámara nativa.
-                        - cameraInput: capture="environment" sin multiple → abre cámara directamente
-                        - galleryInput: multiple sin capture → abre galería para elegir varias
-                    -->
                     <div class="grid grid-cols-2 gap-3">
-                        <!-- Botón Cámara -->
-                        <button type="button" id="btnCamera"
-                            class="flex flex-col items-center justify-center gap-2 py-4 bg-brand-600 hover:bg-brand-700 active:scale-[0.97] text-white rounded-xl font-semibold text-sm transition shadow-md shadow-brand-200">
-                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
+                        <button type="button" id="btnCamera" class="flex flex-col items-center justify-center gap-2 py-4 bg-brand-600 hover:bg-brand-700 active:scale-[0.97] text-white rounded-xl font-semibold text-sm transition shadow-md shadow-brand-200">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
                             Tomar Foto
                         </button>
-
-                        <!-- Botón Galería -->
-                        <button type="button" id="btnGallery"
-                            class="flex flex-col items-center justify-center gap-2 py-4 border-2 border-gray-200 hover:border-brand-400 hover:bg-brand-50 active:scale-[0.97] text-gray-600 hover:text-brand-700 rounded-xl font-semibold text-sm transition">
-                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-                            </svg>
+                        <button type="button" id="btnGallery" class="flex flex-col items-center justify-center gap-2 py-4 border-2 border-gray-200 hover:border-brand-400 hover:bg-brand-50 active:scale-[0.97] text-gray-600 hover:text-brand-700 rounded-xl font-semibold text-sm transition">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
                             Galería
                         </button>
                     </div>
-
-                    <!-- Input cámara: capture fuerza cámara nativa, sin multiple -->
                     <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
-                    <!-- Input galería: multiple para elegir varias fotos, sin capture -->
                     <input type="file" id="galleryInput" accept="image/*" multiple class="hidden">
                 </div>
             </section>
 
-            <!-- ── Botón Guardar ──────────────────────────────── -->
+            <!-- Guardar -->
             <div class="pt-2 sticky bottom-4 z-30">
-                <button type="submit" id="btnSubmit"
-                    class="w-full flex items-center justify-center gap-3 bg-brand-600 hover:bg-brand-700 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-brand-200 transition">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                            d="M5 13l4 4L19 7"/>
-                    </svg>
+                <button type="submit" id="btnSubmit" class="w-full flex items-center justify-center gap-3 bg-brand-600 hover:bg-brand-700 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-brand-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                     <span>Guardar Registro</span>
                 </button>
             </div>
-
         </form>
     </main>
 
-    <!-- ═══ MODAL DE CARGA ════════════════════════════════════════
-         BUG CORREGIDO: Ya no usa class="hidden flex" (conflicto Tailwind).
-         Ahora usa CSS puro + clase .activo para mostrar/ocultar.
-    ═════════════════════════════════════════════════════════════ -->
-    <div id="loadingModal"
-        class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm z-[999]">
-        <div class="bg-white p-8 rounded-2xl flex flex-col items-center shadow-2xl w-10/12 max-w-sm text-center">
-            <div class="w-14 h-14 border-4 border-brand-100 border-t-brand-600 rounded-full animate-spin mb-4"></div>
-            <h3 class="text-xl font-extrabold text-gray-900 mb-1">Procesando...</h3>
-            <p id="loadingStatus" class="text-sm text-gray-500 font-medium">Iniciando subida de datos</p>
+    <!-- FAB -->
+    <button id="fabCalc" title="Calculadora de Compensación" aria-label="Abrir calculadora">
+        <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+            <rect x="4" y="2" width="16" height="20" rx="2"/>
+            <line x1="8" y1="6" x2="16" y2="6"/>
+            <line x1="8" y1="10" x2="10" y2="10"/><line x1="14" y1="10" x2="16" y2="10"/>
+            <line x1="8" y1="14" x2="10" y2="14"/><line x1="14" y1="14" x2="16" y2="14"/>
+            <line x1="8" y1="18" x2="10" y2="18"/><line x1="14" y1="18" x2="16" y2="18"/>
+        </svg>
+    </button>
+
+    <!-- MODAL CALCULADORA -->
+    <div id="calcModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[900]">
+        <div id="calcModalPanel" class="bg-white w-full max-w-lg mx-auto rounded-t-3xl shadow-2xl max-h-[94vh] overflow-y-auto pb-10">
+
+            <!-- Header sticky -->
+            <div class="sticky top-0 bg-white rounded-t-3xl pt-3 pb-4 px-5 border-b border-gray-100 z-10">
+                <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2.5">
+                        <div class="w-9 h-9 bg-amber-100 rounded-xl flex items-center justify-center">
+                            <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div>
+                            <h2 class="text-base font-extrabold text-gray-900 leading-tight">Compensación de Precios</h2>
+                            <p class="text-xs text-gray-500 font-medium">Devolución en pacas por diferencia de precio</p>
+                        </div>
+                    </div>
+                    <button id="btnCloseCalc" class="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="px-5 pt-5 space-y-5">
+
+                <!-- Vendedor y cliente -->
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Vendedor</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>
+                            <select id="calc_promotor" class="w-full pl-11 pr-10 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-100 focus:border-amber-500 transition appearance-none bg-white text-base">
+                                <option value="" disabled selected>Seleccione un vendedor</option>
+                                <option value="ALEIDY COLINA">Aleidy Colina</option>
+                                <option value="DAVID LINARES">David Linares</option>
+                                <option value="DIONERGI GUERRERO">Dionergi Guerrero</option>
+                                <option value="DIOMIRA ROSALES">Diomira Rosales</option>
+                                <option value="EDWIN BRITO">Edwin Brito</option>
+                                <option value="GABRIELA PARRA">Gabriela Parra</option>
+                                <option value="GILBERT RODRIGUEZ">Gilbert Rodriguez</option>
+                                <option value="JESUS FERREIRA">Jesus Ferreira</option>
+                                <option value="JORGE VELASQUEZ">Jorge Velasquez</option>
+                                <option value="JOSE DEL ROSARIO">Jose Del Rosario</option>
+                                <option value="LUIS FLORES">Luis Flores</option>
+                                <option value="MARCOS VIDAL">Marcos Vidal</option>
+                                <option value="MARIO BIGOTT">Mario Bigott</option>
+                                <option value="OWER ABREU">Ower Abreu</option>
+                                <option value="PIERO FIGUEROA">Piero Figueroa</option>
+                                <option value="RAFAEL GARCÍA">Rafael García</option>
+                                <option value="SAULO RIVERO">Saulo Rivero</option>
+                                <option value="SURASKY VILLAFAÑA">Surasky Villafaña</option>
+                                <option value="TORCOROMA VENCE">Torcoroma Vence</option>
+                                <option value="VANESSA VARGAS">Vanessa Vargas</option>
+                                <option value="WILMER DUQUE">Wilmer Duque</option>
+                                <option value="YINIBER PEREIRA">Yiniber Pereira</option>
+                                <option value="YORKEN MAESTRE">Yorken Maestre</option>
+                            </select>
+                            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-semibold text-gray-700 mb-1.5">Cliente / Establecimiento</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div>
+                            <input type="text" id="calc_cliente" placeholder="Nombre del local" class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-100 focus:border-amber-500 transition text-base">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contenedor de SKUs -->
+                <div id="skuContainer"></div>
+
+                <!-- Botón agregar SKU -->
+                <button type="button" id="btnAddSku"
+                    class="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-amber-300 hover:border-amber-400 hover:bg-amber-50 text-amber-700 font-bold text-sm rounded-xl transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
+                    Agregar otro SKU
+                </button>
+
+                <!-- Observaciones -->
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1.5">Observaciones <span class="font-normal text-gray-400">(opcional)</span></label>
+                    <textarea id="calc_obs" rows="2" placeholder="Notas adicionales..." class="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-amber-100 focus:border-amber-500 transition text-base resize-none"></textarea>
+                </div>
+
+                <!-- Botón calcular -->
+                <button type="button" id="btnCalcCalc"
+                    class="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 active:scale-[0.98] text-white py-3.5 rounded-xl font-bold text-base transition shadow-lg shadow-amber-100">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    Calcular Compensación
+                </button>
+
+                <!-- Resultado -->
+                <div id="resultadoComp" class="hidden space-y-4">
+                    <div class="res-card" id="resDesglose"></div>
+                    <button id="btnGuardarComp" type="button"
+                        class="w-full flex items-center justify-center gap-2 bg-brand-600 hover:bg-brand-700 active:scale-[0.98] text-white py-3.5 rounded-xl font-bold text-sm transition shadow-md">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        Guardar Compensación
+                    </button>
+                </div>
+
+                <div class="h-4"></div>
+            </div>
         </div>
     </div>
 
-    <!-- ═══ TOAST ═════════════════════════════════════════════════ -->
-    <div id="toast"
-        class="fixed top-5 left-1/2 -translate-x-1/2 z-[1000] -translate-y-24 opacity-0 transition-all duration-300 ease-out w-11/12 max-w-sm pointer-events-none">
+    <!-- LOADING MODAL -->
+    <div id="loadingModal" class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm z-[999]">
+        <div class="bg-white p-8 rounded-2xl flex flex-col items-center shadow-2xl w-10/12 max-w-sm text-center">
+            <div class="w-14 h-14 border-4 border-brand-100 border-t-brand-600 rounded-full animate-spin mb-4"></div>
+            <h3 class="text-xl font-extrabold text-gray-900 mb-1">Procesando...</h3>
+            <p id="loadingStatus" class="text-sm text-gray-500 font-medium">Iniciando</p>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[1000] -translate-y-24 opacity-0 transition-all duration-300 ease-out w-11/12 max-w-sm pointer-events-none">
         <div class="flex items-center gap-3 bg-gray-900 text-white px-5 py-4 rounded-xl shadow-2xl">
-            <div id="toastIconSuccess" class="hidden shrink-0 text-green-400">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
-                </svg>
-            </div>
-            <div id="toastIconError" class="hidden shrink-0 text-red-400">
-                <!-- BUG CORREGIDO: path del ícono X estaba mal ("l18 18" → "l12 12") -->
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
-                </svg>
-            </div>
+            <div id="toastIconSuccess" class="hidden shrink-0 text-green-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></div>
+            <div id="toastIconError" class="hidden shrink-0 text-red-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></div>
             <p id="toastMessage" class="font-medium text-sm leading-snug"></p>
         </div>
     </div>
 
-    <!-- ═══════════════════════════════════════════════════════════
-         JAVASCRIPT — TODOS LOS BUGS CORREGIDOS
-    ════════════════════════════════════════════════════════════ -->
-    <script>
-    // ──────────────────────────────────────────────────────────────
-    // BUG #1 CORREGIDO (CRÍTICO)
-    // ANTES:  const supabase = supabase.createClient(...)
-    //         → La variable se llamaba igual que el módulo del CDN
-    //           (window.supabase), causando un ReferenceError o un
-    //           bucle de auto-referencia antes de ejecutarse.
-    //
-    // AHORA:  Extraemos createClient de window.supabase y nombramos
-    //         al cliente "sb" para evitar cualquier conflicto.
-    // ──────────────────────────────────────────────────────────────
-    const SUPABASE_URL      = 'https://zgbsrbjtjnozpzxifpua.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnYnNyYmp0am5venB6eGlmcHVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNjI5MjUsImV4cCI6MjA2OTkzODkyNX0.zHVKe6Ab73PFhQqD3Au94x1Z71hMyRpxE1PCWP8-QTI';
+<script>
+// ─── Supabase ────────────────────────────────────────────────
+const SUPABASE_URL      = 'https://zgbsrbjtjnozpzxifpua.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpnYnNyYmp0am5venB6eGlmcHVhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTQzNjI5MjUsImV4cCI6MjA2OTkzODkyNX0.zHVKe6Ab73PFhQqD3Au94x1Z71hMyRpxE1PCWP8-QTI';
+const { createClient } = window.supabase;
+const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const { createClient } = window.supabase;   // ← extraer del CDN
-    const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);  // ← cliente "sb"
+// ─── SKUs disponibles ────────────────────────────────────────
+const SKUS = [
+    'GRAN MARQUÉS GOURMET 900g',
+    'DON JULIÁN TIPO 1 1kg',
+    'DON JULIÁN TIPO 2 900g',
+    'DON JULIÁN TIPO 3',
+    'GRAN MARQUÉS PREMIUM 1kg',
+    'GRAN MARQUÉS SELECTO 850g',
+    'GRAN MARQUÉS SELECTO 2.5kg'
+];
 
-    // ──────────────────────────────────────────────────────────────
-    // REFERENCIAS DOM
-    // ──────────────────────────────────────────────────────────────
-    const form             = document.getElementById('popForm');
-    const btnSubmit        = document.getElementById('btnSubmit');
-    const fotosGrid        = document.getElementById('fotos-grid');
-    const contadorFotos    = document.getElementById('contador-fotos');
-    const loadingModal     = document.getElementById('loadingModal');
-    const loadingStatus    = document.getElementById('loadingStatus');
+function skuOptions(selectedVal = '') {
+    return SKUS.map(s =>
+        `<option value="${s}" ${s === selectedVal ? 'selected' : ''}>${s}</option>`
+    ).join('');
+}
 
-    let fotosArray = [];   // Array en memoria con los archivos a subir
+// ─── Gestión de SKU cards ────────────────────────────────────
+let skuCount = 0;
+const skuContainer = document.getElementById('skuContainer');
 
-    // ──────────────────────────────────────────────────────────────
-    // FOTOS — DOS INPUTS SEPARADOS (cámara nativa + galería)
-    //
-    // Por qué dos inputs:
-    //   • iOS ignora "multiple" cuando hay capture, y viceversa.
-    //   • Android se comporta diferente según fabricante.
-    //   • La única solución robusta es un input por modo.
-    // ──────────────────────────────────────────────────────────────
-    const btnCamera    = document.getElementById('btnCamera');
-    const btnGallery   = document.getElementById('btnGallery');
-    const cameraInput  = document.getElementById('cameraInput');
-    const galleryInput = document.getElementById('galleryInput');
+function addSkuCard(autoFocus = false) {
+    skuCount++;
+    const id = skuCount;
+    const card = document.createElement('div');
+    card.className = 'sku-card';
+    card.dataset.skuId = id;
+    card.innerHTML = `
+        <span class="sku-numero">SKU #${id}</span>
+        ${id > 1 ? `<button type="button" class="sku-remove" data-remove="${id}" title="Eliminar SKU">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>` : ''}
+        <div class="mt-6 space-y-3">
+            <!-- Producto -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Producto</label>
+                <div class="relative">
+                    <select class="sku-producto w-full pl-3 pr-8 py-3 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-100 focus:border-amber-500 appearance-none bg-white text-sm font-medium" data-id="${id}">
+                        <option value="" disabled selected>Seleccione un producto</option>
+                        ${skuOptions()}
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+                </div>
+            </div>
+            <!-- Precios -->
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Precio compra <span class="text-gray-400 font-normal">($/paca)</span></label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-sm font-semibold pointer-events-none">$</span>
+                        <input type="number" class="sku-precio-compra w-full pl-6 pr-2 py-3 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-100 focus:border-amber-500 text-sm" min="0" step="0.01" placeholder="0.00" data-id="${id}">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Precio actual <span class="text-gray-400 font-normal">($/paca)</span></label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-sm font-semibold pointer-events-none">$</span>
+                        <input type="number" class="sku-precio-actual w-full pl-6 pr-2 py-3 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-100 focus:border-amber-500 text-sm" min="0" step="0.01" placeholder="0.00" data-id="${id}">
+                    </div>
+                </div>
+            </div>
+            <!-- Pacas en depósito -->
+            <div>
+                <label class="block text-xs font-semibold text-gray-600 mb-1">Pacas actuales en depósito</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </div>
+                    <input type="number" class="sku-pacas w-full pl-9 pr-3 py-3 border border-amber-200 rounded-xl focus:ring-2 focus:ring-amber-100 focus:border-amber-500 text-sm" min="1" step="1" placeholder="Ej: 10" data-id="${id}">
+                </div>
+            </div>
+        </div>
+    `;
+    skuContainer.appendChild(card);
 
-    btnCamera.addEventListener('click',  () => cameraInput.click());
-    btnGallery.addEventListener('click', () => galleryInput.click());
-
-    function onFilesSelected(e) {
-        const files = Array.from(e.target.files || []);
-        if (!files.length) return;
-        fotosArray.push(...files);
-        renderFotos();
-        e.target.value = '';   // Reset para poder volver a seleccionar
-    }
-
-    cameraInput.addEventListener('change',  onFilesSelected);
-    galleryInput.addEventListener('change', onFilesSelected);
-
-    function renderFotos() {
-        fotosGrid.innerHTML = '';
-
-        if (fotosArray.length > 0) {
-            fotosGrid.classList.remove('hidden');
-            contadorFotos.textContent = `${fotosArray.length} foto${fotosArray.length !== 1 ? 's' : ''}`;
-            contadorFotos.className = 'text-xs font-semibold text-brand-600 bg-brand-100 px-2 py-1 rounded-md';
-        } else {
-            fotosGrid.classList.add('hidden');
-            contadorFotos.textContent = '0 fotos';
-            contadorFotos.className = 'text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md';
-        }
-
-        fotosArray.forEach((file, index) => {
-            const reader = new FileReader();
-            reader.onload = ({ target }) => {
-                const div = document.createElement('div');
-                div.className = 'relative rounded-xl overflow-hidden shadow-sm border border-gray-200 aspect-square bg-gray-50';
-                div.innerHTML = `
-                    <img src="${target.result}" class="w-full h-full object-cover" loading="lazy">
-                    <button type="button" data-idx="${index}"
-                        class="btn-del absolute top-1 right-1 bg-red-500 text-white p-1.5 rounded-full shadow-lg hover:bg-red-600 active:scale-90 transition">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                    </button>
-                `;
-                fotosGrid.appendChild(div);
-                div.querySelector('.btn-del').addEventListener('click', function () {
-                    fotosArray.splice(parseInt(this.dataset.idx), 1);
-                    renderFotos();
-                });
-            };
-            reader.readAsDataURL(file);
+    // Listener eliminar
+    const removeBtn = card.querySelector('.sku-remove');
+    if (removeBtn) {
+        removeBtn.addEventListener('click', () => {
+            card.remove();
+            renumberSkus();
         });
     }
 
-    // ──────────────────────────────────────────────────────────────
-    // ENVÍO DEL FORMULARIO
-    // BUG CORREGIDO: Validaciones ANTES de cualquier operación async
-    // BUG CORREGIDO: Guardar URLs públicas, no rutas internas
-    // ──────────────────────────────────────────────────────────────
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+    if (autoFocus) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
 
-        // 1. Recoger valores
-        const promotorNombre = document.getElementById('promotor').value;  // ya viene en MAYÚSCULAS del value del option
-        const cliente        = document.getElementById('cliente').value.trim();
-        const estado         = document.getElementById('estado').value;
-        const materiales     = Array.from(document.querySelectorAll('.mat-check:checked'))
-                                    .map(cb => cb.value);
+function renumberSkus() {
+    document.querySelectorAll('.sku-card').forEach((card, i) => {
+        const num = card.querySelector('.sku-numero');
+        if (num) num.textContent = `SKU #${i + 1}`;
+    });
+}
 
-        // 2. Validar TODO antes de empezar (sin subir nada aún)
-        if (!promotorNombre)       return showToast('El campo Promotor es requerido.', 'error');
-        if (!cliente)              return showToast('El campo Cliente es requerido.', 'error');
-        if (!estado)               return showToast('Debe seleccionar un estado.', 'error');
-        if (materiales.length === 0) return showToast('Seleccione al menos un material POP.', 'error');
-        if (fotosArray.length === 0) return showToast('Tome al menos una foto de evidencia.', 'error');
+// Iniciar con 1 SKU
+addSkuCard(false);
+document.getElementById('btnAddSku').addEventListener('click', () => addSkuCard(true));
 
-        setLoading(true, 'Verificando promotor...');
+// ─── Lógica de cálculo ───────────────────────────────────────
+let ultimoResultado = null;
 
-        try {
-            // 3. Guardar promotor (upsert — inserta si no existe)
-            const { error: errPromotor } = await sb
-                .from('sorteo_promotores')
-                .upsert([{ nombre: promotorNombre }], { onConflict: 'nombre' });
+document.getElementById('btnCalcCalc').addEventListener('click', () => {
+    const promotor = document.getElementById('calc_promotor').value;
+    const cliente  = document.getElementById('calc_cliente').value.trim();
 
-            if (errPromotor) console.warn('Advertencia promotores:', errPromotor.message);
+    if (!promotor) return showToast('Seleccione un vendedor.', 'error');
+    if (!cliente)  return showToast('Ingrese el nombre del cliente.', 'error');
 
-            // 4. Subir fotos al Storage y obtener URLs públicas
-            const urlsFotos = [];
-            for (let i = 0; i < fotosArray.length; i++) {
-                setLoading(true, `Subiendo foto ${i + 1} de ${fotosArray.length}...`);
-                const file     = fotosArray[i];
-                const ext      = (file.name.split('.').pop() || 'jpg').toLowerCase();
-                const fileName = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
+    const cards = document.querySelectorAll('.sku-card');
+    const skusData = [];
+    let hasError = false;
 
-                const { data: stData, error: stError } = await sb.storage
-                    .from('evidencias')
-                    .upload(fileName, file, { cacheControl: '3600', upsert: false });
+    cards.forEach((card, idx) => {
+        if (hasError) return;
+        const num          = idx + 1;
+        const producto     = card.querySelector('.sku-producto').value;
+        const precioCompra = parseFloat(card.querySelector('.sku-precio-compra').value);
+        const precioActual = parseFloat(card.querySelector('.sku-precio-actual').value);
+        const pacas        = parseInt(card.querySelector('.sku-pacas').value);
 
-                if (stError) throw new Error(`Error al subir foto #${i + 1}: ${stError.message}`);
+        if (!producto)                            { showToast(`SKU #${num}: seleccione un producto.`, 'error'); hasError = true; return; }
+        if (isNaN(precioCompra) || precioCompra <= 0) { showToast(`SKU #${num}: ingrese precio de compra.`, 'error'); hasError = true; return; }
+        if (isNaN(precioActual) || precioActual <= 0) { showToast(`SKU #${num}: ingrese precio actual.`, 'error'); hasError = true; return; }
+        if (isNaN(pacas) || pacas < 1)            { showToast(`SKU #${num}: ingrese cantidad de pacas.`, 'error'); hasError = true; return; }
+        if (precioActual >= precioCompra)          { showToast(`SKU #${num}: precio actual debe ser menor al de compra.`, 'error'); hasError = true; return; }
 
-                // BUG CORREGIDO: obtener URL pública real, no solo la ruta
-                const { data: { publicUrl } } = sb.storage
-                    .from('evidencias')
-                    .getPublicUrl(stData.path);
+        const difPorPaca  = +(precioCompra - precioActual).toFixed(4);
+        const totalComp   = +(difPorPaca * pacas).toFixed(4);
+        // Pacas exactas compensadas al precio actual
+        const pacasExactas  = totalComp / precioActual;
+        const pacasEnteras  = Math.floor(pacasExactas);
+        const residuo       = +(totalComp - pacasEnteras * precioActual).toFixed(4);
 
-                urlsFotos.push(publicUrl);
-            }
-
-            // 5. Insertar registro en la base de datos
-            setLoading(true, 'Guardando registro...');
-            const { error: dbError } = await sb
-                .from('sorteo_registros')
-                .insert([{
-                    promotor_nombre:       promotorNombre,
-                    cliente_nombre:        cliente,
-                    estado:                estado,
-                    materiales_entregados: materiales,   // text[] en Supabase
-                    fotos_urls:            urlsFotos     // text[] en Supabase
-                }]);
-
-            if (dbError) throw new Error(`Error en base de datos: ${dbError.message}`);
-
-            // 6. Éxito
-            setLoading(false);
-            showToast('¡Visita registrada con éxito!', 'success');
-            resetForm();
-
-        } catch (err) {
-            setLoading(false);
-            showToast(err.message, 'error');
-            console.error('Error al guardar:', err);
-        }
+        skusData.push({ num, producto, precioCompra, precioActual, pacas, difPorPaca, totalComp, pacasExactas, pacasEnteras, residuo });
     });
 
-    // ──────────────────────────────────────────────────────────────
-    // HELPERS
-    // ──────────────────────────────────────────────────────────────
+    if (hasError) return;
 
-    /**
-     * Muestra u oculta el modal de carga.
-     * BUG CORREGIDO: ya no usa classList add/remove 'hidden'+'flex'.
-     * Usa la clase CSS .activo que hace display:flex.
-     */
-    function setLoading(show, texto = 'Procesando...') {
-        if (show) {
-            loadingModal.classList.add('activo');
-            loadingStatus.textContent = texto;
-            btnSubmit.disabled = true;
-        } else {
-            loadingModal.classList.remove('activo');
-            btnSubmit.disabled = false;
-            loadingStatus.textContent = 'Iniciando subida de datos';
+    // Calcular gran total residuo (acumulado de todos los SKUs)
+    const totalResiduoGlobal = +skusData.reduce((acc, s) => acc + s.residuo, 0).toFixed(4);
+
+    // Construir HTML de resultado
+    const resDiv  = document.getElementById('resDesglose');
+    let html = `<h3 class="text-sm font-extrabold text-amber-800 uppercase tracking-wider mb-4 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4"/></svg>
+        Resultado del Cálculo
+    </h3>`;
+
+    skusData.forEach(s => {
+        const esExacto = s.pacasExactas % 1 === 0;
+        html += `<div class="res-sku-block">
+            <p class="text-xs font-bold text-amber-700 mb-2">${s.producto}</p>
+            <div class="space-y-1 text-sm">
+                <div class="flex justify-between"><span class="text-gray-500">Pacas en depósito</span><span class="font-semibold">${s.pacas} pacas</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Diferencia por paca</span><span class="font-semibold">$${s.difPorPaca.toFixed(2)}</span></div>
+                <div class="flex justify-between"><span class="text-gray-500">Total a compensar</span><span class="font-semibold text-amber-700">$${s.totalComp.toFixed(2)}</span></div>
+                <div class="flex justify-between items-center border-t border-amber-100 pt-1 mt-1">
+                    <span class="text-gray-700 font-semibold">Pacas a entregar</span>
+                    <span class="text-lg font-extrabold text-amber-700">${esExacto ? s.pacasEnteras : s.pacasExactas.toFixed(2)} pacas</span>
+                </div>
+                ${!esExacto ? `
+                <div class="bg-white rounded-lg p-2 mt-1 space-y-1 text-xs">
+                    <div class="flex justify-between"><span class="text-gray-500">Pacas enteras</span><span class="font-bold">${s.pacasEnteras} pacas</span></div>
+                    <div class="flex justify-between"><span class="text-gray-500">Residuo sin cubrir</span><span class="font-bold text-orange-600">$${s.residuo.toFixed(2)}</span></div>
+                </div>` : ''}
+            </div>
+        </div>`;
+    });
+
+    // Si hay residuo global, mostrar opciones
+    if (totalResiduoGlobal > 0) {
+        html += `
+        <div class="border-t border-amber-200 pt-3 mt-1">
+            <p class="text-xs font-bold text-orange-700 mb-2">⚠️ Residuo total acumulado: <span class="text-base">$${totalResiduoGlobal.toFixed(2)}</span></p>
+            <p class="text-xs text-gray-500 mb-3">¿Cómo se resuelve el residuo?</p>
+            <div class="flex gap-2 mb-3">
+                <button type="button" id="optDinero"
+                    class="flex-1 py-2.5 text-xs font-bold border-2 border-gray-200 rounded-xl text-gray-600 hover:border-amber-400 hover:text-amber-700 transition opcion-residuo" data-opt="dinero">
+                    💵 Diferencia en $
+                </button>
+                <button type="button" id="optOtroSku"
+                    class="flex-1 py-2.5 text-xs font-bold border-2 border-gray-200 rounded-xl text-gray-600 hover:border-amber-400 hover:text-amber-700 transition opcion-residuo" data-opt="sku">
+                    📦 Completar con otro SKU
+                </button>
+            </div>
+            <!-- Panel: otro SKU -->
+            <div id="panelOtroSku" class="hidden space-y-3 bg-orange-50 border border-orange-200 rounded-xl p-3">
+                <p class="text-xs text-gray-600 font-medium">Selecciona el SKU de menor valor con el que se completa:</p>
+                <div class="relative">
+                    <select id="skuCompSelector" class="w-full pl-3 pr-8 py-3 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-100 focus:border-orange-400 appearance-none bg-white text-sm font-medium">
+                        <option value="" disabled selected>Seleccione producto</option>
+                        ${skuOptions()}
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-gray-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-600 mb-1">Precio de ese SKU ($/paca)</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400 text-sm font-semibold pointer-events-none">$</span>
+                        <input type="number" id="skuCompPrecio" min="0" step="0.01" placeholder="0.00" class="w-full pl-6 pr-2 py-3 border border-orange-200 rounded-xl focus:ring-2 focus:ring-orange-100 focus:border-orange-400 text-sm">
+                    </div>
+                </div>
+                <button type="button" id="btnCalcOtroSku"
+                    class="w-full py-2.5 bg-orange-500 hover:bg-orange-600 text-white text-xs font-bold rounded-xl transition">
+                    Calcular pacas de completación
+                </button>
+                <!-- Resultado otro SKU -->
+                <div id="resOtroSku" class="hidden bg-white rounded-xl p-3 text-sm space-y-1 border border-orange-100">
+                </div>
+            </div>
+            <!-- Panel: dinero -->
+            <div id="panelDinero" class="hidden bg-green-50 border border-green-200 rounded-xl p-3 text-sm text-green-800 font-semibold text-center">
+                💵 Se devolverán <span class="text-base font-extrabold">$${totalResiduoGlobal.toFixed(2)}</span> en efectivo al cliente.
+            </div>
+        </div>`;
+    }
+
+    resDiv.innerHTML = html;
+    document.getElementById('resultadoComp').classList.remove('hidden');
+    document.getElementById('resultadoComp').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    // Guardar resultado preliminar
+    ultimoResultado = {
+        promotor_nombre: promotor,
+        cliente_nombre:  cliente,
+        observaciones:   document.getElementById('calc_obs').value.trim() || null,
+        skus:            skusData,
+        residuo_global:  totalResiduoGlobal,
+        resolucion_residuo: null,
+        completacion_sku:   null,
+        completacion_pacas: null,
+        completacion_excedente: null
+    };
+
+    // Listeners opciones residuo
+    if (totalResiduoGlobal > 0) {
+        document.querySelectorAll('.opcion-residuo').forEach(btn => {
+            btn.addEventListener('click', function () {
+                document.querySelectorAll('.opcion-residuo').forEach(b => {
+                    b.classList.remove('border-amber-500','text-amber-700','bg-amber-50');
+                    b.classList.add('border-gray-200','text-gray-600');
+                });
+                this.classList.add('border-amber-500','text-amber-700','bg-amber-50');
+                this.classList.remove('border-gray-200','text-gray-600');
+
+                const opt = this.dataset.opt;
+                document.getElementById('panelOtroSku').classList.toggle('hidden', opt !== 'sku');
+                document.getElementById('panelDinero').classList.toggle('hidden', opt !== 'dinero');
+                if (ultimoResultado) ultimoResultado.resolucion_residuo = opt === 'dinero' ? 'EFECTIVO' : 'OTRO_SKU';
+            });
+        });
+
+        // Calcular otro SKU
+        document.getElementById('btnCalcOtroSku').addEventListener('click', () => {
+            const skuComp   = document.getElementById('skuCompSelector').value;
+            const precioComp = parseFloat(document.getElementById('skuCompPrecio').value);
+            if (!skuComp)                             return showToast('Seleccione el SKU de completación.', 'error');
+            if (isNaN(precioComp) || precioComp <= 0) return showToast('Ingrese el precio del SKU de completación.', 'error');
+
+            // Pacas necesarias para cubrir el residuo (puede pasarse)
+            const pacasNecesarias = totalResiduoGlobal / precioComp;
+            const pacasCierre     = Math.ceil(pacasNecesarias);  // redondeo arriba → se pasa un poco o es exacto
+            const montoEntregado  = +(pacasCierre * precioComp).toFixed(4);
+            const excedente       = +(montoEntregado - totalResiduoGlobal).toFixed(4);
+
+            const resDiv2 = document.getElementById('resOtroSku');
+            resDiv2.classList.remove('hidden');
+            resDiv2.innerHTML = `
+                <div class="flex justify-between"><span class="text-gray-500 text-xs">SKU de completación</span><span class="font-bold text-xs">${skuComp}</span></div>
+                <div class="flex justify-between"><span class="text-gray-500 text-xs">Precio</span><span class="font-bold text-xs">$${precioComp.toFixed(2)}/paca</span></div>
+                <div class="flex justify-between"><span class="text-gray-500 text-xs">Pacas exactas necesarias</span><span class="font-semibold text-xs">${pacasNecesarias.toFixed(2)} pacas</span></div>
+                <div class="flex justify-between border-t border-orange-100 pt-1 mt-1">
+                    <span class="font-bold text-gray-700 text-sm">Pacas a entregar</span>
+                    <span class="font-extrabold text-orange-700 text-lg">${pacasCierre} pacas</span>
+                </div>
+                <div class="flex justify-between"><span class="text-gray-500 text-xs">Monto entregado</span><span class="font-semibold text-xs">$${montoEntregado.toFixed(2)}</span></div>
+                ${excedente > 0 ? `<div class="flex justify-between"><span class="text-gray-500 text-xs">Excedente a favor del cliente</span><span class="font-semibold text-xs text-green-600">+$${excedente.toFixed(2)}</span></div>` : `<div class="text-xs text-green-600 font-semibold text-center">✓ Cuenta saldada exactamente</div>`}
+            `;
+
+            if (ultimoResultado) {
+                ultimoResultado.completacion_sku       = skuComp;
+                ultimoResultado.completacion_pacas     = pacasCierre;
+                ultimoResultado.completacion_excedente = excedente;
+            }
+        });
+    }
+});
+
+// ─── Guardar en Supabase ─────────────────────────────────────
+document.getElementById('btnGuardarComp').addEventListener('click', async () => {
+    if (!ultimoResultado) return showToast('Primero calcule la compensación.', 'error');
+
+    // Armar filas a insertar (una por SKU)
+    const filas = ultimoResultado.skus.map(s => ({
+        promotor_nombre:        ultimoResultado.promotor_nombre,
+        cliente_nombre:         ultimoResultado.cliente_nombre,
+        observaciones:          ultimoResultado.observaciones,
+        producto:               s.producto,
+        precio_compra:          s.precioCompra,
+        precio_actual:          s.precioActual,
+        pacas_deposito:         s.pacas,
+        diferencia_por_paca:    s.difPorPaca,
+        total_a_compensar:      s.totalComp,
+        pacas_a_entregar:       s.pacasEnteras,
+        monto_residual:         s.residuo,
+        residuo_global:         ultimoResultado.residuo_global,
+        resolucion_residuo:     ultimoResultado.resolucion_residuo,
+        completacion_sku:       ultimoResultado.completacion_sku,
+        completacion_pacas:     ultimoResultado.completacion_pacas,
+        completacion_excedente: ultimoResultado.completacion_excedente
+    }));
+
+    setLoading(true, 'Guardando compensación...');
+    try {
+        const { error } = await sb.from('compensaciones').insert(filas);
+        if (error) throw new Error(error.message);
+        setLoading(false);
+        showToast('¡Compensación guardada!', 'success');
+        resetCalc();
+        cerrarCalcModal();
+    } catch (err) {
+        setLoading(false);
+        showToast(err.message, 'error');
+    }
+});
+
+function resetCalc() {
+    document.getElementById('calc_promotor').value = '';
+    document.getElementById('calc_cliente').value  = '';
+    document.getElementById('calc_obs').value      = '';
+    skuContainer.innerHTML = '';
+    skuCount = 0;
+    addSkuCard(false);
+    document.getElementById('resultadoComp').classList.add('hidden');
+    ultimoResultado = null;
+}
+
+// ─── FAB / Modal ─────────────────────────────────────────────
+const fabCalc      = document.getElementById('fabCalc');
+const calcModal    = document.getElementById('calcModal');
+const btnCloseCalc = document.getElementById('btnCloseCalc');
+
+fabCalc.addEventListener('click', () => {
+    calcModal.classList.add('activo');
+    document.body.style.overflow = 'hidden';
+});
+function cerrarCalcModal() {
+    calcModal.classList.remove('activo');
+    document.body.style.overflow = '';
+}
+btnCloseCalc.addEventListener('click', cerrarCalcModal);
+calcModal.addEventListener('click', e => { if (e.target === calcModal) cerrarCalcModal(); });
+
+// ─── Formulario POP ──────────────────────────────────────────
+const form          = document.getElementById('popForm');
+const btnSubmit     = document.getElementById('btnSubmit');
+const fotosGrid     = document.getElementById('fotos-grid');
+const contadorFotos = document.getElementById('contador-fotos');
+const loadingModal  = document.getElementById('loadingModal');
+const loadingStatus = document.getElementById('loadingStatus');
+let fotosArray      = [];
+
+document.getElementById('btnCamera').addEventListener('click',  () => document.getElementById('cameraInput').click());
+document.getElementById('btnGallery').addEventListener('click', () => document.getElementById('galleryInput').click());
+
+function onFilesSelected(e) {
+    const files = Array.from(e.target.files || []);
+    if (!files.length) return;
+    fotosArray.push(...files);
+    renderFotos();
+    e.target.value = '';
+}
+document.getElementById('cameraInput').addEventListener('change',  onFilesSelected);
+document.getElementById('galleryInput').addEventListener('change', onFilesSelected);
+
+function renderFotos() {
+    fotosGrid.innerHTML = '';
+    if (fotosArray.length > 0) {
+        fotosGrid.classList.remove('hidden');
+        contadorFotos.textContent = `${fotosArray.length} foto${fotosArray.length !== 1 ? 's' : ''}`;
+        contadorFotos.className = 'text-xs font-semibold text-brand-600 bg-brand-100 px-2 py-1 rounded-md';
+    } else {
+        fotosGrid.classList.add('hidden');
+        contadorFotos.textContent = '0 fotos';
+        contadorFotos.className = 'text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md';
+    }
+    fotosArray.forEach((file, index) => {
+        const reader = new FileReader();
+        reader.onload = ({ target }) => {
+            const div = document.createElement('div');
+            div.className = 'relative rounded-xl overflow-hidden shadow-sm border border-gray-200 aspect-square bg-gray-50';
+            div.innerHTML = `<img src="${target.result}" class="w-full h-full object-cover" loading="lazy">
+                <button type="button" data-idx="${index}" class="btn-del absolute top-1 right-1 bg-red-500 text-white p-1.5 rounded-full shadow-lg hover:bg-red-600 active:scale-90 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>`;
+            fotosGrid.appendChild(div);
+            div.querySelector('.btn-del').addEventListener('click', function () {
+                fotosArray.splice(parseInt(this.dataset.idx), 1);
+                renderFotos();
+            });
+        };
+        reader.readAsDataURL(file);
+    });
+}
+
+form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const promotorNombre = document.getElementById('promotor').value;
+    const cliente        = document.getElementById('cliente').value.trim();
+    const estado         = document.getElementById('estado').value;
+    const materiales     = Array.from(document.querySelectorAll('.mat-check:checked')).map(cb => cb.value);
+
+    if (!promotorNombre)         return showToast('El campo Promotor es requerido.', 'error');
+    if (!cliente)                return showToast('El campo Cliente es requerido.', 'error');
+    if (!estado)                 return showToast('Debe seleccionar un estado.', 'error');
+    if (materiales.length === 0) return showToast('Seleccione al menos un material POP.', 'error');
+    if (fotosArray.length === 0) return showToast('Tome al menos una foto de evidencia.', 'error');
+
+    setLoading(true, 'Verificando promotor...');
+    try {
+        await sb.from('sorteo_promotores').upsert([{ nombre: promotorNombre }], { onConflict: 'nombre' });
+        const urlsFotos = [];
+        for (let i = 0; i < fotosArray.length; i++) {
+            setLoading(true, `Subiendo foto ${i + 1} de ${fotosArray.length}...`);
+            const file     = fotosArray[i];
+            const ext      = (file.name.split('.').pop() || 'jpg').toLowerCase();
+            const fileName = `${Date.now()}_${Math.random().toString(36).slice(2, 7)}.${ext}`;
+            const { data: stData, error: stError } = await sb.storage.from('evidencias').upload(fileName, file, { cacheControl: '3600', upsert: false });
+            if (stError) throw new Error(`Error al subir foto #${i + 1}: ${stError.message}`);
+            const { data: { publicUrl } } = sb.storage.from('evidencias').getPublicUrl(stData.path);
+            urlsFotos.push(publicUrl);
         }
+        setLoading(true, 'Guardando registro...');
+        const { error: dbError } = await sb.from('sorteo_registros').insert([{
+            promotor_nombre: promotorNombre, cliente_nombre: cliente,
+            estado, materiales_entregados: materiales, fotos_urls: urlsFotos
+        }]);
+        if (dbError) throw new Error(dbError.message);
+        setLoading(false);
+        showToast('¡Visita registrada con éxito!', 'success');
+        form.reset(); fotosArray = []; renderFotos();
+    } catch (err) {
+        setLoading(false);
+        showToast(err.message, 'error');
     }
+});
 
-    function showToast(message, type = 'error') {
-        const toast = document.getElementById('toast');
-        document.getElementById('toastMessage').textContent = message;
-        document.getElementById('toastIconSuccess').classList.toggle('hidden', type !== 'success');
-        document.getElementById('toastIconError').classList.toggle('hidden',   type !== 'error');
-
-        toast.classList.remove('-translate-y-24', 'opacity-0');
-        toast.classList.add('translate-y-0', 'opacity-100');
-        setTimeout(() => {
-            toast.classList.remove('translate-y-0', 'opacity-100');
-            toast.classList.add('-translate-y-24', 'opacity-0');
-        }, 3500);
+// ─── Helpers ─────────────────────────────────────────────────
+function setLoading(show, texto = 'Procesando...') {
+    if (show) {
+        loadingModal.classList.add('activo');
+        loadingStatus.textContent = texto;
+        btnSubmit.disabled = true;
+    } else {
+        loadingModal.classList.remove('activo');
+        btnSubmit.disabled = false;
+        loadingStatus.textContent = 'Iniciando';
     }
+}
 
-    function resetForm() {
-        form.reset();
-        fotosArray = [];
-        renderFotos();
-    }
-    </script>
+function showToast(message, type = 'error') {
+    const toast = document.getElementById('toast');
+    document.getElementById('toastMessage').textContent = message;
+    document.getElementById('toastIconSuccess').classList.toggle('hidden', type !== 'success');
+    document.getElementById('toastIconError').classList.toggle('hidden',   type !== 'error');
+    toast.classList.remove('-translate-y-24', 'opacity-0');
+    toast.classList.add('translate-y-0', 'opacity-100');
+    setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('-translate-y-24', 'opacity-0');
+    }, 3500);
+}
+</script>
 </body>
 </html>
