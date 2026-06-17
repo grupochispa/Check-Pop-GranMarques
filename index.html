@@ -402,17 +402,13 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const { createClient } = window.supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ─── SKUs ─────────────────────────────────────────────────────
 const SKUS = [
     'GRAN MARQUÉS GOURMET 900g','DON JULIÁN TIPO 1 1kg','DON JULIÁN TIPO 2 900g',
     'DON JULIÁN TIPO 3','GRAN MARQUÉS PREMIUM 1kg','GRAN MARQUÉS SELECTO 850g','GRAN MARQUÉS SELECTO 2.5kg'
 ];
 const skuOptions = (sel='') => SKUS.map(s=>`<option value="${s}"${s===sel?' selected':''}>${s}</option>`).join('');
-
-// ─── Helpers matemáticos ──────────────────────────────────────
 const r2 = v => Math.round(v * 100) / 100;
 
-// ─── SKU Cards ────────────────────────────────────────────────
 let skuCount = 0;
 const skuContainer = document.getElementById('skuContainer');
 
@@ -441,30 +437,22 @@ function addSkuCard(scroll=false) {
                     </select>
                 </div>
             </div>
-
-            <!-- Número de factura -->
             <div>
                 <label class="field-label">N° de Factura</label>
                 <input type="text" class="sku-factura input-base" placeholder="Ej: FAC-2024-001" data-id="${id}">
             </div>
 
-            <!-- BLOQUE 1: FACTURA ORIGINAL -->
+            <!-- ══ PASO 1: PRECIO AL QUE SE VENDIÓ (ORIGINAL) ══ -->
             <div style="background:#eff6ff;border:1.5px solid #bae6fd;border-radius:14px;padding:12px;">
-                <p style="font-size:11px;font-weight:800;color:#0369a1;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">
-                    📄 Factura original
-                </p>
+                <p style="font-size:11px;font-weight:800;color:#0369a1;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">1️⃣ Precio al que se vendió</p>
+                <p style="font-size:11px;color:#0369a1;opacity:.75;margin-bottom:10px;">Lo que pagó el cliente en su momento (con promo y pronto pago).</p>
                 <div class="space-y-3">
-
-                    <!-- Monto factura -->
                     <div>
                         <label class="field-label">Monto total de la factura <span class="field-sub">($)</span></label>
-                        <div class="input-prefix">
-                            <span>$</span>
+                        <div class="input-prefix"><span>$</span>
                             <input type="number" class="sku-monto-factura input-base" min="0" step="0.01" placeholder="0.00" data-id="${id}" style="border-color:#bae6fd;">
                         </div>
                     </div>
-
-                    <!-- Condición de pago -->
                     <div>
                         <label class="field-label">Condición de pago</label>
                         <div class="select-wrap">
@@ -476,340 +464,254 @@ function addSkuCard(scroll=false) {
                             </select>
                         </div>
                     </div>
-
-                    <!-- Pacas -->
                     <div class="grid2">
                         <div>
                             <label class="field-label">Pacas facturadas</label>
-                            <input type="number" class="sku-pacas-total input-base" min="1" step="1" placeholder="Ej: 130" data-id="${id}" style="border-color:#bae6fd;">
+                            <input type="number" class="sku-pacas-total input-base" min="1" step="1" placeholder="Ej: 150" data-id="${id}" style="border-color:#bae6fd;">
                         </div>
                         <div>
                             <label class="field-label">Pacas de promoción</label>
                             <input type="number" class="sku-promo-pacas input-base" min="0" step="1" placeholder="0" value="0" data-id="${id}" style="border-color:#bae6fd;">
                         </div>
                     </div>
-
-                    <!-- Info: precio real por paca (automático) -->
-                    <div class="sku-precio-real-wrap hidden" data-id="${id}"
-                        style="background:white;border-radius:10px;padding:8px 12px;">
+                    <div class="sku-precio-real-wrap hidden" data-id="${id}" style="background:white;border-radius:10px;padding:8px 12px;">
                         <div class="flex justify-between items-center">
-                            <span style="font-size:12px;color:#0369a1;font-weight:600;">Precio real / paca pagado</span>
-                            <span class="sku-precio-real-val" style="font-size:15px;font-weight:800;color:#0369a1;">—</span>
+                            <span style="font-size:12px;color:#0369a1;font-weight:700;">💲 Precio real pagado / paca</span>
+                            <span class="sku-precio-real-val" style="font-size:16px;font-weight:800;color:#0369a1;">—</span>
                         </div>
                         <p class="sku-precio-real-formula" style="font-size:10px;color:#9ca3af;margin-top:2px;"></p>
                     </div>
-
-                    <!-- Precio anterior de venta al público -->
-                    <div>
-                        <label class="field-label">Precio anterior de venta al público <span class="field-sub">(a cuánto lo vendía el cliente)</span></label>
-                        <div class="input-prefix">
-                            <span>$</span>
-                            <input type="number" class="sku-precio-anterior input-base" min="0" step="0.01" placeholder="0.00" data-id="${id}" style="border-color:#bae6fd;">
-                        </div>
-                    </div>
                 </div>
             </div>
 
-            <!-- BLOQUE 2: RECONOCIMIENTO ACTUAL -->
+            <!-- ══ PASO 2: PRECIO NUEVO (RECONOCIMIENTO) ══ -->
             <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:14px;padding:12px;">
-                <p style="font-size:11px;font-weight:800;color:#b45309;text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;">
-                    🔄 Reconocimiento actual
-                </p>
+                <p style="font-size:11px;font-weight:800;color:#b45309;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">2️⃣ Precio nuevo por paca</p>
+                <p style="font-size:11px;color:#b45309;opacity:.75;margin-bottom:10px;">Precio actual de mercado (siempre menor). Se le aplica la misma promo y pronto pago.</p>
                 <div class="space-y-3">
-
-                    <!-- Pacas a reconocer -->
+                    <div>
+                        <label class="field-label">Precio nuevo por paca <span class="field-sub">($ bruto actual)</span></label>
+                        <div class="input-prefix"><span>$</span>
+                            <input type="number" class="sku-precio-nuevo input-base" min="0" step="0.01" placeholder="0.00" data-id="${id}" style="border-color:#fde68a;">
+                        </div>
+                    </div>
+                    <div class="sku-precio-neto-wrap hidden" data-id="${id}" style="background:white;border-radius:10px;padding:8px 12px;">
+                        <div class="flex justify-between items-center">
+                            <span style="font-size:12px;color:#16a34a;font-weight:700;">✅ Precio nuevo neto / paca</span>
+                            <span class="sku-precio-neto-val" style="font-size:16px;font-weight:800;color:#16a34a;">—</span>
+                        </div>
+                        <p class="sku-precio-neto-formula" style="font-size:10px;color:#9ca3af;margin-top:2px;"></p>
+                    </div>
                     <div>
                         <label class="field-label">Pacas a reconocer <span class="field-sub">(esta visita)</span></label>
-                        <input type="number" class="sku-pacas-reconocer input-base" min="1" step="1" placeholder="Ej: 132" data-id="${id}" style="border-color:#fde68a;">
-                    </div>
-
-                    <!-- Precio de piso -->
-                    <div>
-                        <label class="field-label">Precio de piso <span class="field-sub">(mínimo al que puede vender al público)</span></label>
-                        <div class="input-prefix">
-                            <span>$</span>
-                            <input type="number" class="sku-precio-piso input-base" min="0" step="0.01" placeholder="0.00" data-id="${id}" style="border-color:#fde68a;">
-                        </div>
-                    </div>
-
-                    <!-- Precio actual (monto actual = pacas × precio piso, editable) -->
-                    <div>
-                        <label class="field-label">Precio actual por paca <span class="field-sub">(se calcula del piso, editable)</span></label>
-                        <div class="input-prefix" style="position:relative;">
-                            <span>$</span>
-                            <input type="number" class="sku-precio-actual input-base" min="0" step="0.01" placeholder="Se calcula solo" data-id="${id}" style="border-color:#fde68a;">
-                            <div class="sku-auto-badge hidden" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:#dcfce7;color:#166534;font-size:10px;font-weight:700;padding:2px 7px;border-radius:999px;pointer-events:none;">AUTO</div>
-                        </div>
-                        <p class="text-xs mt-1" style="color:#9ca3af;">Por defecto igual al precio de piso. Ajusta si el reconocimiento cambia el precio.</p>
-                    </div>
-
-                    <!-- Precio final de venta -->
-                    <div>
-                        <label class="field-label">Precio final de venta al público <span class="field-sub">(a cuánto quedará vendiéndolo)</span></label>
-                        <div class="input-prefix">
-                            <span>$</span>
-                            <input type="number" class="sku-precio-final input-base" min="0" step="0.01" placeholder="0.00" data-id="${id}" style="border-color:#fde68a;">
-                        </div>
-                    </div>
-
-                    <!-- Fotos de inventario -->
-                    <div>
-                        <label class="field-label">Fotos de inventario</label>
-                        <div class="flex items-center gap-2 mt-1">
-                            <button type="button" class="sku-btn-camara flex-1 flex items-center justify-center gap-2 py-3 bg-brand-600 text-white rounded-xl font-semibold text-sm transition hover:bg-brand-700 active:scale-[0.97]" data-id="${id}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                Cámara
-                            </button>
-                            <button type="button" class="sku-btn-galeria flex-1 flex items-center justify-center gap-2 py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-semibold text-sm transition hover:border-brand-400 hover:bg-brand-50 active:scale-[0.97]" data-id="${id}">
-                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                                Galería
-                            </button>
-                            <span class="sku-foto-count text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-md min-w-[40px] text-center" data-id="${id}">0</span>
-                        </div>
-                        <input type="file" class="sku-input-camara hidden" accept="image/*" capture="environment" data-id="${id}">
-                        <input type="file" class="sku-input-galeria hidden" accept="image/*" multiple data-id="${id}">
-                        <div class="sku-fotos-grid hidden mt-2 grid grid-cols-3 gap-2" data-id="${id}"></div>
+                        <input type="number" class="sku-pacas-reconocer input-base" min="1" step="1" placeholder="Ej: 80" data-id="${id}" style="border-color:#fde68a;">
                     </div>
                 </div>
             </div>
 
-            <!-- RESULTADO EN TIEMPO REAL -->
-            <div class="sku-resultado hidden" data-id="${id}"
-                style="background:linear-gradient(135deg,#fffbeb,#fff7ed);border:1.5px solid #fcd34d;border-radius:14px;padding:12px;">
-                <p style="font-size:11px;font-weight:800;color:#b45309;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">⚡ Resultado</p>
+            <!-- ══ PASO 3: PRECIO POR UNIDAD (REFERENCIA) ══ -->
+            <div style="background:#f5f3ff;border:1.5px solid #ddd6fe;border-radius:14px;padding:12px;">
+                <p style="font-size:11px;font-weight:800;color:#6d28d9;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">3️⃣ Precio por unidad <span style="font-weight:600;opacity:.7;">(referencia)</span></p>
+                <p style="font-size:11px;color:#6d28d9;opacity:.75;margin-bottom:10px;">A cuánto vende la unidad al público, antes y después.</p>
+                <div class="grid2">
+                    <div>
+                        <label class="field-label">Precio unidad ANTES</label>
+                        <div class="input-prefix"><span>$</span>
+                            <input type="number" class="sku-unidad-antes input-base" min="0" step="0.01" placeholder="0.00" data-id="${id}" style="border-color:#ddd6fe;">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="field-label">Precio unidad DESPUÉS</label>
+                        <div class="input-prefix"><span>$</span>
+                            <input type="number" class="sku-unidad-despues input-base" min="0" step="0.01" placeholder="0.00" data-id="${id}" style="border-color:#ddd6fe;">
+                        </div>
+                    </div>
+                </div>
+                <div class="sku-variacion-wrap hidden" data-id="${id}" style="background:white;border-radius:10px;padding:8px 12px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:#6d28d9;font-weight:700;">Variación precio unidad</span>
+                    <span class="sku-variacion-val" style="font-size:15px;font-weight:800;">—</span>
+                </div>
+            </div>
+
+            <!-- Fotos de inventario -->
+            <div>
+                <label class="field-label">Fotos de inventario</label>
+                <div class="flex items-center gap-2 mt-1">
+                    <button type="button" class="sku-btn-camara flex-1 flex items-center justify-center gap-2 py-3 bg-brand-600 text-white rounded-xl font-semibold text-sm transition hover:bg-brand-700 active:scale-[0.97]" data-id="${id}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                        Cámara
+                    </button>
+                    <button type="button" class="sku-btn-galeria flex-1 flex items-center justify-center gap-2 py-3 border-2 border-gray-200 text-gray-600 rounded-xl font-semibold text-sm transition hover:border-brand-400 hover:bg-brand-50 active:scale-[0.97]" data-id="${id}">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                        Galería
+                    </button>
+                    <span class="sku-foto-count text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-md min-w-[40px] text-center" data-id="${id}">0</span>
+                </div>
+                <input type="file" class="sku-input-camara hidden" accept="image/*" capture="environment" data-id="${id}">
+                <input type="file" class="sku-input-galeria hidden" accept="image/*" multiple data-id="${id}">
+                <div class="sku-fotos-grid hidden mt-2 grid grid-cols-3 gap-2" data-id="${id}"></div>
+            </div>
+
+            <!-- RESULTADO -->
+            <div class="sku-resultado hidden" data-id="${id}" style="background:linear-gradient(135deg,#fffbeb,#fff7ed);border:1.5px solid #fcd34d;border-radius:14px;padding:12px;">
+                <p style="font-size:11px;font-weight:800;color:#b45309;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">⚡ Resultado</p>
                 <div class="space-y-1">
-                    <div class="res-row"><span class="lbl">Precio real pagado / paca</span><span class="sku-r-precio-real val">—</span></div>
-                    <div class="res-row"><span class="lbl">Precio actual / paca</span><span class="sku-r-precio-actual val">—</span></div>
+                    <div class="res-row"><span class="lbl">Precio real pagado / paca</span><span class="sku-r-real val">—</span></div>
+                    <div class="res-row"><span class="lbl">Precio nuevo neto / paca</span><span class="sku-r-neto val" style="color:#16a34a;">—</span></div>
                     <div class="res-row" style="border-top:1px dashed #fde68a;padding-top:5px;margin-top:3px;">
-                        <span class="lbl font-semibold">Diferencia a compensar / paca</span>
-                        <span class="sku-r-diferencia val" style="color:#d97706;">—</span>
+                        <span class="lbl font-semibold">Diferencia / paca</span><span class="sku-r-dif val" style="color:#d97706;">—</span>
                     </div>
-                    <div class="res-row">
-                        <span class="lbl">Total a compensar</span>
-                        <span class="sku-r-total val" style="color:#b45309;">—</span>
-                    </div>
-                    <div class="res-row highlight">
-                        <span class="lbl">Pacas a entregar ↓</span>
-                        <span class="sku-r-pacas val">—</span>
-                    </div>
-                    <div class="sku-r-margen-wrap hidden" style="background:white;border-radius:10px;padding:8px 12px;margin-top:6px;">
-                        <p style="font-size:10px;font-weight:800;color:#374151;text-transform:uppercase;margin-bottom:4px;">📊 Variación de precio de venta</p>
-                        <div class="res-row"><span class="lbl">Precio anterior venta</span><span class="sku-r-anterior val">—</span></div>
-                        <div class="res-row"><span class="lbl">Precio final venta</span><span class="sku-r-final val">—</span></div>
-                        <div class="res-row" style="border-top:1px dashed #e5e7eb;padding-top:4px;">
-                            <span class="lbl font-semibold">Variación</span>
-                            <span class="sku-r-variacion val font-extrabold">—</span>
-                        </div>
-                    </div>
+                    <div class="res-row"><span class="lbl">Pacas a reconocer</span><span class="sku-r-recon val">—</span></div>
+                    <div class="res-row"><span class="lbl">Total a compensar</span><span class="sku-r-total val" style="color:#b45309;">—</span></div>
+                    <div class="res-row highlight"><span class="lbl">Pacas a entregar ↓</span><span class="sku-r-pacas val">—</span></div>
                 </div>
             </div>
-
         </div>
     `;
     skuContainer.appendChild(card);
 
-    // ── Remove btn
     const rb = card.querySelector('.sku-remove');
     if (rb) rb.addEventListener('click', () => { card.remove(); renumberSkus(); });
 
-    // ── Input refs
-    const inpMonto       = card.querySelector('.sku-monto-factura');
-    const inpCondicion   = card.querySelector('.sku-condicion');
-    const inpPacasTotal  = card.querySelector('.sku-pacas-total');
-    const inpPromo       = card.querySelector('.sku-promo-pacas');
-    const inpPacasRecon  = card.querySelector('.sku-pacas-reconocer');
-    const inpPrecioAntes = card.querySelector('.sku-precio-anterior');
-    const inpPrecioPI    = card.querySelector('.sku-precio-piso');
-    const inpPrecioAct   = card.querySelector('.sku-precio-actual');
-    const inpPrecioFinal = card.querySelector('.sku-precio-final');
-    const autoBadge      = card.querySelector('.sku-auto-badge');
-    const precioRealWrap = card.querySelector('.sku-precio-real-wrap');
-    const precioRealVal  = card.querySelector('.sku-precio-real-val');
-    const precioRealForm = card.querySelector('.sku-precio-real-formula');
-    const resBloque      = card.querySelector('.sku-resultado');
-    let precioActManual  = false;
+    const $ = cls => card.querySelector(cls);
+    const inpMonto    = $('.sku-monto-factura');
+    const inpCond     = $('.sku-condicion');
+    const inpPacas    = $('.sku-pacas-total');
+    const inpPromo    = $('.sku-promo-pacas');
+    const inpNuevo    = $('.sku-precio-nuevo');
+    const inpRecon    = $('.sku-pacas-reconocer');
+    const inpUAntes   = $('.sku-unidad-antes');
+    const inpUDespues = $('.sku-unidad-despues');
 
-    // ── Precio real / paca (automático informativo)
-    function calcPrecioReal() {
-        const monto    = parseFloat(inpMonto.value)      || 0;
-        const desc     = parseFloat(inpCondicion.value)  || 0;
-        const pacas    = parseInt(inpPacasTotal.value)   || 0;
-        const promo    = parseInt(inpPromo.value)        || 0;
-        const total    = pacas + promo;
-        if (monto > 0 && pacas > 0) {
-            const montoEfect = r2(monto * (1 - desc/100));
-            const pxp        = r2(montoEfect / total);
-            precioRealVal.textContent = `$${pxp.toFixed(2)}`;
-            precioRealForm.textContent = desc > 0
-                ? `($${monto.toFixed(2)} × ${(100-desc)}%) ÷ ${total} pacas`
-                : `$${monto.toFixed(2)} ÷ ${total} pacas`;
-            precioRealWrap.classList.remove('hidden');
-            return pxp;
-        }
-        precioRealWrap.classList.add('hidden');
-        return 0;
-    }
+    function computar() {
+        const monto = parseFloat(inpMonto.value) || 0;
+        const desc  = parseFloat(inpCond.value)  || 0;
+        const pacas = parseInt(inpPacas.value)   || 0;
+        const promo = parseInt(inpPromo.value)   || 0;
+        const total = pacas + promo;
+        const fDesc = (1 - desc/100);
+        const fPromo= total > 0 ? (pacas / total) : 1;
 
-    // ── Precio actual auto = precio piso
-    function syncPrecioActual() {
-        if (precioActManual) return;
-        const piso = parseFloat(inpPrecioPI.value) || 0;
-        if (piso > 0) {
-            inpPrecioAct.value = piso.toFixed(2);
-            autoBadge.classList.remove('hidden');
-        } else {
-            inpPrecioAct.value = '';
-            autoBadge.classList.add('hidden');
-        }
-        calcResultado();
-    }
-
-    inpPrecioAct.addEventListener('focus', () => {
-        precioActManual = true;
-        autoBadge.classList.add('hidden');
-    });
-
-    // ── Resultado en tiempo real
-    function calcResultado() {
-        const precioReal   = calcPrecioReal();
-        const precioAct    = parseFloat(inpPrecioAct.value)   || 0;
-        const pacasRecon   = parseInt(inpPacasRecon.value)    || 0;
-        const precioAntes  = parseFloat(inpPrecioAntes.value) || 0;
-        const precioFinal  = parseFloat(inpPrecioFinal.value) || 0;
-
-        if (precioReal > 0 && precioAct > 0 && pacasRecon > 0) {
-            const difPorPaca    = r2(precioReal - precioAct);
-            const totalComp     = r2(difPorPaca * pacasRecon);
-            const pacasEntregar = Math.floor(totalComp / precioAct);
-
-            resBloque.classList.remove('hidden');
-            card.querySelector('.sku-r-precio-real').textContent   = `$${precioReal.toFixed(2)}`;
-            card.querySelector('.sku-r-precio-actual').textContent  = `$${precioAct.toFixed(2)}`;
-
-            if (difPorPaca > 0) {
-                card.querySelector('.sku-r-diferencia').textContent = `$${difPorPaca.toFixed(2)}/paca`;
-                card.querySelector('.sku-r-diferencia').style.color = '#d97706';
-                card.querySelector('.sku-r-total').textContent      = `$${totalComp.toFixed(2)}`;
-                card.querySelector('.sku-r-pacas').textContent      = `${pacasEntregar} paca${pacasEntregar!==1?'s':''}`;
-                card.querySelector('.sku-r-pacas').style.color      = '#b45309';
-            } else {
-                card.querySelector('.sku-r-diferencia').textContent = 'Sin diferencia';
-                card.querySelector('.sku-r-diferencia').style.color = '#6b7280';
-                card.querySelector('.sku-r-total').textContent      = '$0.00';
-                card.querySelector('.sku-r-pacas').textContent      = '0 pacas';
-                card.querySelector('.sku-r-pacas').style.color      = '#6b7280';
-            }
-
-            // ── Variación precio de venta
-            const margenWrap = card.querySelector('.sku-r-margen-wrap');
-            if (precioAntes > 0 && precioFinal > 0) {
-                const variacion = r2(((precioFinal - precioAntes) / precioAntes) * 100);
-                const signo     = variacion >= 0 ? '+' : '';
-                const color     = variacion >= 0 ? '#16a34a' : '#dc2626';
-                margenWrap.classList.remove('hidden');
-                card.querySelector('.sku-r-anterior').textContent  = `$${precioAntes.toFixed(2)}`;
-                card.querySelector('.sku-r-final').textContent     = `$${precioFinal.toFixed(2)}`;
-                card.querySelector('.sku-r-variacion').textContent = `${signo}${variacion.toFixed(2)}%`;
-                card.querySelector('.sku-r-variacion').style.color = color;
-            } else {
-                margenWrap.classList.add('hidden');
-            }
-        } else {
-            resBloque.classList.add('hidden');
-        }
-    }
-
-    // ── Listeners
-    [inpMonto, inpCondicion, inpPacasTotal, inpPromo].forEach(el => el.addEventListener('input', () => { calcPrecioReal(); calcResultado(); }));
-    inpPrecioPI.addEventListener('input',    () => { syncPrecioActual(); calcResultado(); });
-    inpPrecioAct.addEventListener('input',   calcResultado);
-    inpPacasRecon.addEventListener('input',  calcResultado);
-    inpPrecioAntes.addEventListener('input', calcResultado);
-    inpPrecioFinal.addEventListener('input', calcResultado);
-
-    // ── Fotos por SKU
-    const btnCam    = card.querySelector('.sku-btn-camara');
-    const btnGal    = card.querySelector('.sku-btn-galeria');
-    const inpCam    = card.querySelector('.sku-input-camara');
-    const inpGal    = card.querySelector('.sku-input-galeria');
-    const fotosGrid = card.querySelector('.sku-fotos-grid');
-    const fotoCount = card.querySelector('.sku-foto-count');
-    let   fotosArr  = [];
-
-    btnCam.addEventListener('click', () => inpCam.click());
-    btnGal.addEventListener('click', () => inpGal.click());
-
-    function onFotos(e) {
-        const files = Array.from(e.target.files || []);
-        if (!files.length) return;
-        fotosArr.push(...files);
-        renderFotosCard();
-        e.target.value = '';
-    }
-    inpCam.addEventListener('change', onFotos);
-    inpGal.addEventListener('change', onFotos);
-
-    function renderFotosCard() {
-        fotosGrid.innerHTML = '';
-        if (fotosArr.length > 0) {
-            fotosGrid.classList.remove('hidden');
-            fotoCount.textContent = fotosArr.length;
-            fotoCount.className = 'sku-foto-count text-xs font-bold text-brand-600 bg-brand-100 px-2 py-1 rounded-md min-w-[40px] text-center';
-        } else {
-            fotosGrid.classList.add('hidden');
-            fotoCount.textContent = '0';
-            fotoCount.className = 'sku-foto-count text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-md min-w-[40px] text-center';
-        }
-        fotosArr.forEach((file, idx) => {
-            const reader = new FileReader();
-            reader.onload = ({target}) => {
-                const div = document.createElement('div');
-                div.className = 'relative rounded-xl overflow-hidden border border-gray-200 aspect-square bg-gray-50';
-                div.innerHTML = `<img src="${target.result}" class="w-full h-full object-cover">
-                    <button type="button" data-idx="${idx}" class="foto-del absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full shadow">
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                    </button>`;
-                fotosGrid.appendChild(div);
-                div.querySelector('.foto-del').addEventListener('click', function() {
-                    fotosArr.splice(parseInt(this.dataset.idx),1); renderFotosCard();
-                });
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
-    // Expose fotosArr for saving
-    card._getFotos = () => fotosArr;
-    card._getCalc  = () => {
-        const monto    = parseFloat(inpMonto.value)      || 0;
-        const desc     = parseFloat(inpCondicion.value)  || 0;
-        const pacas    = parseInt(inpPacasTotal.value)   || 0;
-        const promo    = parseInt(inpPromo.value)        || 0;
-        const total    = pacas + promo;
-        const montoEfect = r2(monto * (1 - desc/100));
+        // Paso 1: precio real original neto
+        const montoEfect = r2(monto * fDesc);
         const precioReal = total > 0 ? r2(montoEfect / total) : 0;
-        const precioAct  = parseFloat(inpPrecioAct.value)   || 0;
-        const pacasRecon = parseInt(inpPacasRecon.value)     || 0;
-        const difPorPaca = r2(precioReal - precioAct);
-        const totalComp  = r2(difPorPaca * pacasRecon);
+
+        // Paso 2: precio nuevo neto (mismos condicionales)
+        const precioNuevoBruto = parseFloat(inpNuevo.value) || 0;
+        const precioNuevoNeto  = r2(precioNuevoBruto * fDesc * fPromo);
+
+        const pacasRecon = parseInt(inpRecon.value) || 0;
+
+        // Paso 3: diferencia y pacas a entregar (con el precio nuevo neto)
+        const difPaca   = r2(precioReal - precioNuevoNeto);
+        const totalComp = r2(difPaca * pacasRecon);
+        const pacasEnt  = (difPaca > 0 && precioNuevoNeto > 0) ? Math.floor(totalComp / precioNuevoNeto) : 0;
+
+        // Referencia: variación precio unidad
+        const uAntes   = parseFloat(inpUAntes.value)   || 0;
+        const uDespues = parseFloat(inpUDespues.value) || 0;
+        const variacion = (uAntes > 0 && uDespues > 0) ? r2(((uDespues - uAntes)/uAntes)*100) : null;
+
         return {
-            producto:          card.querySelector('.sku-producto').value,
-            factura:           card.querySelector('.sku-factura').value.trim(),
-            monto_factura:     monto,
-            descuento_pct:     desc,
-            monto_efectivo:    montoEfect,
-            pacas_factura:     pacas,
-            pacas_promo:       promo,
-            pacas_totales:     total,
-            precio_real_paca:  precioReal,
-            precio_anterior:   parseFloat(inpPrecioAntes.value) || 0,
-            pacas_a_reconocer: pacasRecon,
-            precio_piso:       parseFloat(inpPrecioPI.value)  || 0,
-            precio_actual:     precioAct,
-            precio_final:      parseFloat(inpPrecioFinal.value) || 0,
-            diferencia_paca:   difPorPaca,
-            total_compensar:   totalComp,
-            pacas_a_entregar:  Math.floor(totalComp / precioAct) || 0
+            monto, desc, pacas, promo, total, fDesc, fPromo, montoEfect, precioReal,
+            precioNuevoBruto, precioNuevoNeto, pacasRecon, difPaca, totalComp, pacasEnt,
+            uAntes, uDespues, variacion
+        };
+    }
+
+    function actualizar() {
+        const c = computar();
+
+        // Precio real
+        const realWrap = $('.sku-precio-real-wrap');
+        if (c.monto > 0 && c.pacas > 0) {
+            $('.sku-precio-real-val').textContent = `$${c.precioReal.toFixed(2)}`;
+            $('.sku-precio-real-formula').textContent = c.desc > 0
+                ? `($${c.monto.toFixed(2)} × ${100-c.desc}%) ÷ ${c.total} pacas`
+                : `$${c.monto.toFixed(2)} ÷ ${c.total} pacas`;
+            realWrap.classList.remove('hidden');
+        } else realWrap.classList.add('hidden');
+
+        // Precio nuevo neto
+        const netoWrap = $('.sku-precio-neto-wrap');
+        if (c.precioNuevoBruto > 0 && c.total > 0) {
+            $('.sku-precio-neto-val').textContent = `$${c.precioNuevoNeto.toFixed(2)}`;
+            const rebaja = r2(c.precioNuevoBruto - c.precioNuevoNeto);
+            const partes = [];
+            if (c.desc > 0)  partes.push(`pronto pago ${c.desc}%`);
+            if (c.promo > 0) partes.push(`promo ${c.promo}/${c.total}`);
+            if (partes.length) {
+                $('.sku-precio-neto-formula').innerHTML =
+                    `$${c.precioNuevoBruto.toFixed(2)} bruto − <b style="color:#dc2626;">$${rebaja.toFixed(2)}</b> (${partes.join(' + ')})`;
+            } else {
+                $('.sku-precio-neto-formula').innerHTML =
+                    `Esta factura no tuvo descuentos → neto = bruto`;
+            }
+            netoWrap.classList.remove('hidden');
+        } else netoWrap.classList.add('hidden');
+
+        // Variación unidad
+        const varWrap = $('.sku-variacion-wrap');
+        if (c.variacion !== null) {
+            const signo = c.variacion >= 0 ? '+' : '';
+            $('.sku-variacion-val').textContent = `${signo}${c.variacion.toFixed(2)}%`;
+            $('.sku-variacion-val').style.color = c.variacion >= 0 ? '#16a34a' : '#dc2626';
+            varWrap.classList.remove('hidden');
+        } else varWrap.classList.add('hidden');
+
+        // Resultado
+        const resBloque = $('.sku-resultado');
+        if (c.precioReal > 0 && c.precioNuevoNeto > 0 && c.pacasRecon > 0) {
+            resBloque.classList.remove('hidden');
+            $('.sku-r-real').textContent  = `$${c.precioReal.toFixed(2)}`;
+            $('.sku-r-neto').textContent  = `$${c.precioNuevoNeto.toFixed(2)}`;
+            $('.sku-r-recon').textContent = `${c.pacasRecon} pacas`;
+            if (c.difPaca > 0) {
+                $('.sku-r-dif').textContent   = `$${c.difPaca.toFixed(2)}/paca`;
+                $('.sku-r-dif').style.color   = '#d97706';
+                $('.sku-r-total').textContent = `$${c.totalComp.toFixed(2)}`;
+                $('.sku-r-pacas').textContent = `${c.pacasEnt} paca${c.pacasEnt!==1?'s':''}`;
+                $('.sku-r-pacas').style.color = '#b45309';
+            } else {
+                $('.sku-r-dif').textContent   = 'Sin diferencia';
+                $('.sku-r-dif').style.color   = '#6b7280';
+                $('.sku-r-total').textContent = '$0.00';
+                $('.sku-r-pacas').textContent = '0 pacas';
+                $('.sku-r-pacas').style.color = '#6b7280';
+            }
+        } else resBloque.classList.add('hidden');
+    }
+
+    [inpMonto,inpCond,inpPacas,inpPromo,inpNuevo,inpRecon,inpUAntes,inpUDespues]
+        .forEach(el => el.addEventListener('input', actualizar));
+
+    // Fotos
+    const btnCam=$('.sku-btn-camara'), btnGal=$('.sku-btn-galeria'),
+          inpCam=$('.sku-input-camara'), inpGal=$('.sku-input-galeria'),
+          fGrid=$('.sku-fotos-grid'), fCount=$('.sku-foto-count');
+    let fotosArr=[];
+    btnCam.addEventListener('click',()=>inpCam.click());
+    btnGal.addEventListener('click',()=>inpGal.click());
+    function onF(e){const f=Array.from(e.target.files||[]);if(!f.length)return;fotosArr.push(...f);renderF();e.target.value='';}
+    inpCam.addEventListener('change',onF); inpGal.addEventListener('change',onF);
+    function renderF(){
+        fGrid.innerHTML='';
+        if(fotosArr.length>0){fGrid.classList.remove('hidden');fCount.textContent=fotosArr.length;fCount.className='sku-foto-count text-xs font-bold text-brand-600 bg-brand-100 px-2 py-1 rounded-md min-w-[40px] text-center';}
+        else{fGrid.classList.add('hidden');fCount.textContent='0';fCount.className='sku-foto-count text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-md min-w-[40px] text-center';}
+        fotosArr.forEach((file,idx)=>{const rd=new FileReader();rd.onload=({target})=>{const div=document.createElement('div');div.className='relative rounded-xl overflow-hidden border border-gray-200 aspect-square bg-gray-50';div.innerHTML=`<img src="${target.result}" class="w-full h-full object-cover"><button type="button" data-idx="${idx}" class="foto-del absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full shadow"><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>`;fGrid.appendChild(div);div.querySelector('.foto-del').addEventListener('click',function(){fotosArr.splice(parseInt(this.dataset.idx),1);renderF();});};rd.readAsDataURL(file);});
+    }
+
+    card._getFotos = () => fotosArr;
+    card._getCalc = () => {
+        const c = computar();
+        return {
+            producto: $('.sku-producto').value, factura: $('.sku-factura').value.trim(),
+            monto_factura:c.monto, descuento_pct:c.desc, monto_efectivo:c.montoEfect,
+            pacas_factura:c.pacas, pacas_promo:c.promo, pacas_totales:c.total,
+            precio_real_paca:c.precioReal, precio_nuevo_bruto:c.precioNuevoBruto, precio_nuevo_neto:c.precioNuevoNeto,
+            pacas_a_reconocer:c.pacasRecon,
+            unidad_antes:c.uAntes, unidad_despues:c.uDespues, variacion_unidad_pct:c.variacion,
+            diferencia_paca:c.difPaca, total_compensar:c.totalComp, pacas_a_entregar:c.pacasEnt
         };
     };
 
@@ -817,18 +719,14 @@ function addSkuCard(scroll=false) {
 }
 
 function renumberSkus() {
-    document.querySelectorAll('.sku-card').forEach((c,i) => {
-        const tag = c.querySelector('.sku-tag');
-        if (tag) tag.innerHTML = `<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg> SKU #${i+1}`;
-    });
+    document.querySelectorAll('.sku-card').forEach((c,i)=>{const t=c.querySelector('.sku-tag');if(t)t.innerHTML=`<svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg> SKU #${i+1}`;});
 }
 
 addSkuCard(false);
 document.getElementById('btnAddSku').addEventListener('click', () => addSkuCard(true));
 
-// ─── Calcular / mostrar resumen ───────────────────────────────
-let ultimoResultado = null;
-let tipoCierre      = null;
+// ─── Calcular / resumen ───────────────────────────────────────
+let ultimoResultado = null, tipoCierre = null;
 
 document.getElementById('btnCalcCalc').addEventListener('click', () => {
     const promotor = document.getElementById('calc_promotor').value;
@@ -837,86 +735,58 @@ document.getElementById('btnCalcCalc').addEventListener('click', () => {
     if (!cliente)  return showToast('Ingrese el nombre del cliente.', 'error');
 
     const cards = document.querySelectorAll('.sku-card');
-    const skusData = [];
-    let err = false;
+    const skusData = []; let err = false;
 
     cards.forEach((card, idx) => {
         if (err) return;
-        const n   = idx + 1;
-        const d   = card._getCalc();
-
-        if (!d.producto)              { showToast(`SKU #${n}: seleccione un producto.`, 'error'); err=true; return; }
-        if (!d.factura)               { showToast(`SKU #${n}: ingrese el número de factura.`, 'error'); err=true; return; }
-        if (d.monto_factura <= 0)     { showToast(`SKU #${n}: ingrese el monto de la factura.`, 'error'); err=true; return; }
-        if (d.pacas_factura < 1)      { showToast(`SKU #${n}: ingrese las pacas facturadas.`, 'error'); err=true; return; }
-        if (d.pacas_a_reconocer < 1)  { showToast(`SKU #${n}: ingrese las pacas a reconocer.`, 'error'); err=true; return; }
-        if (d.precio_piso <= 0)       { showToast(`SKU #${n}: ingrese el precio de piso.`, 'error'); err=true; return; }
-        if (d.precio_actual <= 0)     { showToast(`SKU #${n}: ingrese el precio actual.`, 'error'); err=true; return; }
-        if (d.precio_final <= 0)      { showToast(`SKU #${n}: ingrese el precio final de venta.`, 'error'); err=true; return; }
-        if (d.precio_actual > d.precio_real_paca) { showToast(`SKU #${n}: el precio actual no puede ser mayor al precio real pagado.`, 'error'); err=true; return; }
-
-        const variacion = d.precio_anterior > 0
-            ? r2(((d.precio_final - d.precio_anterior) / d.precio_anterior) * 100)
-            : null;
-
-        skusData.push({ ...d, n, variacion, fotos: card._getFotos() });
+        const n = idx + 1, d = card._getCalc();
+        if (!d.producto)             { showToast(`SKU #${n}: seleccione un producto.`,'error'); err=true; return; }
+        if (!d.factura)              { showToast(`SKU #${n}: ingrese el número de factura.`,'error'); err=true; return; }
+        if (d.monto_factura<=0)      { showToast(`SKU #${n}: ingrese el monto de la factura.`,'error'); err=true; return; }
+        if (d.pacas_factura<1)       { showToast(`SKU #${n}: ingrese las pacas facturadas.`,'error'); err=true; return; }
+        if (d.precio_nuevo_bruto<=0) { showToast(`SKU #${n}: ingrese el precio nuevo por paca.`,'error'); err=true; return; }
+        if (d.pacas_a_reconocer<1)   { showToast(`SKU #${n}: ingrese las pacas a reconocer.`,'error'); err=true; return; }
+        if (d.precio_nuevo_neto>=d.precio_real_paca) { showToast(`SKU #${n}: el precio nuevo neto debe ser menor al precio real pagado.`,'error'); err=true; return; }
+        skusData.push({ ...d, n, fotos: card._getFotos() });
     });
-
     if (err) return;
 
-    // Renderizar resumen
     const resDiv = document.getElementById('resDesglose');
     resDiv.innerHTML = '';
-
     skusData.forEach(s => {
         const bloque = document.createElement('div');
         bloque.className = 'res-sku-block';
-        const signo = s.variacion !== null ? (s.variacion >= 0 ? '+' : '') : '';
-        const varColor = s.variacion !== null ? (s.variacion >= 0 ? '#16a34a' : '#dc2626') : '#6b7280';
-
+        let varHtml = '';
+        if (s.variacion_unidad_pct !== null) {
+            const signo = s.variacion_unidad_pct >= 0 ? '+' : '';
+            const color = s.variacion_unidad_pct >= 0 ? '#16a34a' : '#dc2626';
+            varHtml = `<div class="res-row"><span class="lbl">Precio unidad antes</span><span class="val">$${s.unidad_antes.toFixed(2)}</span></div>
+                <div class="res-row"><span class="lbl">Precio unidad después</span><span class="val">$${s.unidad_despues.toFixed(2)}</span></div>
+                <div class="res-row" style="border-top:1px dashed #ddd6fe;padding-top:4px;"><span class="lbl font-semibold">Variación unidad</span><span class="val font-extrabold" style="color:${color};">${signo}${s.variacion_unidad_pct.toFixed(2)}%</span></div>`;
+        }
         bloque.innerHTML = `
             <div class="flex items-center justify-between mb-3">
                 <p class="text-xs font-extrabold text-amber-700">${s.producto}</p>
                 <span class="pill-info">Factura: ${s.factura}</span>
             </div>
             <div style="background:#eff6ff;border-radius:10px;padding:8px 12px;margin-bottom:8px;">
-                <p style="font-size:10px;font-weight:800;color:#0369a1;text-transform:uppercase;margin-bottom:5px;">📄 Factura</p>
+                <p style="font-size:10px;font-weight:800;color:#0369a1;text-transform:uppercase;margin-bottom:5px;">1️⃣ Precio vendido</p>
                 <div class="res-row"><span class="lbl">Monto factura</span><span class="val">$${s.monto_factura.toFixed(2)}</span></div>
-                ${s.descuento_pct > 0 ? `<div class="res-row"><span class="lbl">Pronto pago ${s.descuento_pct}%</span><span class="val" style="color:#16a34a;">−$${r2(s.monto_factura-s.monto_efectivo).toFixed(2)}</span></div>
-                <div class="res-row"><span class="lbl">Monto efectivo</span><span class="val">$${s.monto_efectivo.toFixed(2)}</span></div>` : ''}
-                <div class="res-row"><span class="lbl">Pacas facturadas</span><span class="val">${s.pacas_factura}</span></div>
-                ${s.pacas_promo > 0 ? `<div class="res-row"><span class="lbl">+ Promo</span><span class="val" style="color:#16a34a;">+${s.pacas_promo} pacas</span></div>
-                <div class="res-row"><span class="lbl font-semibold">Total recibidas</span><span class="val font-extrabold">${s.pacas_totales}</span></div>` : ''}
-                <div class="res-row" style="border-top:1px dashed #bae6fd;padding-top:5px;margin-top:3px;">
-                    <span class="lbl font-semibold">Precio real / paca</span>
-                    <span class="val font-extrabold" style="color:#0369a1;">$${s.precio_real_paca.toFixed(2)}</span>
-                </div>
-                ${s.precio_anterior > 0 ? `<div class="res-row"><span class="lbl">Precio anterior venta</span><span class="val">$${s.precio_anterior.toFixed(2)}</span></div>` : ''}
+                ${s.descuento_pct>0?`<div class="res-row"><span class="lbl">Pronto pago ${s.descuento_pct}%</span><span class="val" style="color:#16a34a;">−$${r2(s.monto_factura-s.monto_efectivo).toFixed(2)}</span></div>`:''}
+                <div class="res-row"><span class="lbl">Pacas facturadas</span><span class="val">${s.pacas_factura}${s.pacas_promo>0?` + ${s.pacas_promo} promo`:''}</span></div>
+                <div class="res-row" style="border-top:1px dashed #bae6fd;padding-top:5px;margin-top:3px;"><span class="lbl font-semibold">Precio real / paca</span><span class="val font-extrabold" style="color:#0369a1;">$${s.precio_real_paca.toFixed(2)}</span></div>
             </div>
             <div style="background:#fffbeb;border-radius:10px;padding:8px 12px;margin-bottom:8px;">
-                <p style="font-size:10px;font-weight:800;color:#b45309;text-transform:uppercase;margin-bottom:5px;">🔄 Reconocimiento</p>
+                <p style="font-size:10px;font-weight:800;color:#b45309;text-transform:uppercase;margin-bottom:5px;">2️⃣ Precio nuevo</p>
+                <div class="res-row"><span class="lbl">Precio nuevo bruto</span><span class="val">$${s.precio_nuevo_bruto.toFixed(2)}</span></div>
+                <div class="res-row"><span class="lbl font-semibold">Precio nuevo neto</span><span class="val font-extrabold" style="color:#16a34a;">$${s.precio_nuevo_neto.toFixed(2)}</span></div>
                 <div class="res-row"><span class="lbl">Pacas a reconocer</span><span class="val">${s.pacas_a_reconocer}</span></div>
-                <div class="res-row"><span class="lbl">Precio de piso</span><span class="val">$${s.precio_piso.toFixed(2)}</span></div>
-                <div class="res-row"><span class="lbl">Precio actual / paca</span><span class="val">$${s.precio_actual.toFixed(2)}</span></div>
-                <div class="res-row"><span class="lbl">Precio final venta</span><span class="val" style="color:#0369a1;">$${s.precio_final.toFixed(2)}</span></div>
-                ${s.variacion !== null ? `<div class="res-row" style="border-top:1px dashed #fde68a;padding-top:5px;margin-top:3px;">
-                    <span class="lbl font-semibold">Variación precio venta</span>
-                    <span class="val font-extrabold" style="color:${varColor};">${signo}${s.variacion.toFixed(2)}%</span>
-                </div>` : ''}
             </div>
-            <div class="res-row" style="border-top:1.5px solid #fde68a;padding-top:8px;">
-                <span class="lbl font-semibold">Diferencia / paca</span>
-                <span class="val" style="color:#d97706;">$${s.diferencia_paca.toFixed(2)}</span>
-            </div>
-            <div class="res-row">
-                <span class="lbl">Total a compensar</span>
-                <span class="val" style="color:#b45309;">$${s.total_compensar.toFixed(2)}</span>
-            </div>
-            <div class="res-row highlight">
-                <span class="lbl">Pacas a entregar ↓</span>
-                <span class="val">${s.pacas_a_entregar} paca${s.pacas_a_entregar!==1?'s':''}</span>
-            </div>
-            ${s.fotos.length > 0 ? `<p style="font-size:11px;color:#6b7280;margin-top:6px;">📷 ${s.fotos.length} foto${s.fotos.length!==1?'s':''} de inventario adjunta${s.fotos.length!==1?'s':''}</p>` : ''}
+            ${varHtml?`<div style="background:#f5f3ff;border-radius:10px;padding:8px 12px;margin-bottom:8px;"><p style="font-size:10px;font-weight:800;color:#6d28d9;text-transform:uppercase;margin-bottom:5px;">3️⃣ Precio unidad (ref.)</p>${varHtml}</div>`:''}
+            <div class="res-row" style="border-top:1.5px solid #fde68a;padding-top:8px;"><span class="lbl font-semibold">Diferencia / paca</span><span class="val" style="color:#d97706;">$${s.diferencia_paca.toFixed(2)}</span></div>
+            <div class="res-row"><span class="lbl">Total a compensar</span><span class="val" style="color:#b45309;">$${s.total_compensar.toFixed(2)}</span></div>
+            <div class="res-row highlight"><span class="lbl">Pacas a entregar ↓</span><span class="val">${s.pacas_a_entregar} paca${s.pacas_a_entregar!==1?'s':''}</span></div>
+            ${s.fotos.length>0?`<p style="font-size:11px;color:#6b7280;margin-top:6px;">📷 ${s.fotos.length} foto${s.fotos.length!==1?'s':''} de inventario</p>`:''}
         `;
         resDiv.appendChild(bloque);
     });
@@ -930,15 +800,9 @@ document.getElementById('btnCalcCalc').addEventListener('click', () => {
     document.getElementById('panelPedido').classList.add('hidden');
     document.getElementById('panelPrecio').classList.add('hidden');
 
-    ultimoResultado = {
-        promotor_nombre: promotor,
-        cliente_nombre:  cliente,
-        observaciones:   document.getElementById('calc_obs').value.trim() || null,
-        skus: skusData
-    };
+    ultimoResultado = { promotor_nombre:promotor, cliente_nombre:cliente, observaciones:document.getElementById('calc_obs').value.trim()||null, skus:skusData };
 });
 
-// ─── Cierre ───────────────────────────────────────────────────
 function setCierre(tipo) {
     tipoCierre = tipo;
     document.getElementById('btnCierrePedido').classList.toggle('activo', tipo==='pedido');
@@ -950,223 +814,121 @@ function setCierre(tipo) {
 }
 
 function renderResumenPedido() {
-    const div = document.getElementById('resumenPedido');
-    div.innerHTML = ultimoResultado.skus.map(s => `
+    document.getElementById('resumenPedido').innerHTML = ultimoResultado.skus.map(s => `
         <div style="padding:6px 0;border-top:1px solid #dbeafe;">
-            <div class="flex justify-between items-center">
-                <span style="font-size:12px;color:#1e40af;font-weight:600;">${s.producto}</span>
-                <span style="font-size:14px;font-weight:800;color:#1d4ed8;">+${s.pacas_a_entregar} paca${s.pacas_a_entregar!==1?'s':''}</span>
-            </div>
-            <div class="flex justify-between" style="font-size:11px;color:#6b7280;margin-top:2px;">
-                <span>Factura ${s.factura}</span><span>Diferencia: $${s.total_compensar.toFixed(2)}</span>
-            </div>
+            <div class="flex justify-between items-center"><span style="font-size:12px;color:#1e40af;font-weight:600;">${s.producto}</span><span style="font-size:14px;font-weight:800;color:#1d4ed8;">+${s.pacas_a_entregar} paca${s.pacas_a_entregar!==1?'s':''}</span></div>
+            <div class="flex justify-between" style="font-size:11px;color:#6b7280;margin-top:2px;"><span>Factura ${s.factura}</span><span>Compensar: $${s.total_compensar.toFixed(2)}</span></div>
         </div>`).join('');
 }
-
 function renderPreciosFijos() {
-    const cont = document.getElementById('precioFijoContainer');
-    cont.innerHTML = ultimoResultado.skus.map((s,i) => `
-        <div>
-            <label class="field-label">${s.producto}</label>
-            <div class="input-prefix">
-                <span>$</span>
-                <input type="number" min="0" step="0.01" placeholder="0.00"
-                    class="input-base precio-fijo-input" data-idx="${i}" style="border-color:#bfdbfe;" id="pf_${i}">
-            </div>
-        </div>`).join('');
+    document.getElementById('precioFijoContainer').innerHTML = ultimoResultado.skus.map((s,i)=>`
+        <div><label class="field-label">${s.producto}</label><div class="input-prefix"><span>$</span><input type="number" min="0" step="0.01" placeholder="0.00" class="input-base precio-fijo-input" data-idx="${i}" style="border-color:#bfdbfe;" id="pf_${i}"></div></div>`).join('');
 }
 
-// ─── Guardar ──────────────────────────────────────────────────
 document.getElementById('btnGuardarComp').addEventListener('click', async () => {
     if (!ultimoResultado) return showToast('Primero calcule la compensación.', 'error');
     if (!tipoCierre)      return showToast('Seleccione cómo se cierra la compensación.', 'error');
-
     let preciosFijos = [];
     if (tipoCierre === 'precio') {
-        const inputs = document.querySelectorAll('.precio-fijo-input');
-        let pErr = false;
-        inputs.forEach((inp,i) => {
-            const v = parseFloat(inp.value);
-            if (isNaN(v)||v<=0) { showToast(`Ingrese precio fijo para: ${ultimoResultado.skus[i].producto}`, 'error'); pErr=true; return; }
-            preciosFijos.push(v);
-        });
+        const inputs = document.querySelectorAll('.precio-fijo-input'); let pErr=false;
+        inputs.forEach((inp,i)=>{const v=parseFloat(inp.value);if(isNaN(v)||v<=0){showToast(`Ingrese precio fijo para: ${ultimoResultado.skus[i].producto}`,'error');pErr=true;return;}preciosFijos.push(v);});
         if (pErr) return;
     }
-
     setLoading(true, 'Subiendo fotos de inventario...');
     try {
         const filas = [];
-        for (let i=0; i<ultimoResultado.skus.length; i++) {
-            const s = ultimoResultado.skus[i];
-            const urlsFotos = [];
-            for (let j=0; j<s.fotos.length; j++) {
+        for (let i=0;i<ultimoResultado.skus.length;i++){
+            const s = ultimoResultado.skus[i]; const urlsFotos = [];
+            for (let j=0;j<s.fotos.length;j++){
                 setLoading(true, `SKU ${i+1}: foto ${j+1} de ${s.fotos.length}...`);
-                const file = s.fotos[j];
-                const ext  = (file.name.split('.').pop()||'jpg').toLowerCase();
-                const fname= `inv_${Date.now()}_${Math.random().toString(36).slice(2,6)}.${ext}`;
-                const {data:st, error:stErr} = await sb.storage.from('evidencias').upload(fname, file, {cacheControl:'3600', upsert:false});
+                const file=s.fotos[j], ext=(file.name.split('.').pop()||'jpg').toLowerCase();
+                const fname=`inv_${Date.now()}_${Math.random().toString(36).slice(2,6)}.${ext}`;
+                const {data:st,error:stErr}=await sb.storage.from('evidencias').upload(fname,file,{cacheControl:'3600',upsert:false});
                 if (stErr) throw new Error(`Foto inventario: ${stErr.message}`);
-                const {data:{publicUrl}} = sb.storage.from('evidencias').getPublicUrl(st.path);
+                const {data:{publicUrl}}=sb.storage.from('evidencias').getPublicUrl(st.path);
                 urlsFotos.push(publicUrl);
             }
             filas.push({
-                promotor_nombre:    ultimoResultado.promotor_nombre,
-                cliente_nombre:     ultimoResultado.cliente_nombre,
-                observaciones:      ultimoResultado.observaciones,
-                producto:           s.producto,
-                numero_factura:     s.factura,
-                monto_factura:      s.monto_factura,
-                descuento_pct:      s.descuento_pct,
-                monto_efectivo:     s.monto_efectivo,
-                pacas_factura:      s.pacas_factura,
-                pacas_promo:        s.pacas_promo,
-                pacas_totales:      s.pacas_totales,
-                precio_real_paca:   s.precio_real_paca,
-                precio_anterior:    s.precio_anterior || null,
-                pacas_a_reconocer:  s.pacas_a_reconocer,
-                precio_piso:        s.precio_piso,
-                precio_actual:      s.precio_actual,
-                precio_final:       s.precio_final,
-                variacion_pct:      s.variacion,
-                diferencia_paca:    s.diferencia_paca,
-                total_compensar:    s.total_compensar,
-                pacas_a_entregar:   s.pacas_a_entregar,
-                tipo_cierre:        tipoCierre.toUpperCase(),
-                precio_fijo_cliente:tipoCierre==='precio' ? preciosFijos[i] : null,
-                fotos_inventario:   urlsFotos
+                promotor_nombre:ultimoResultado.promotor_nombre, cliente_nombre:ultimoResultado.cliente_nombre,
+                observaciones:ultimoResultado.observaciones, producto:s.producto, numero_factura:s.factura,
+                monto_factura:s.monto_factura, descuento_pct:s.descuento_pct, monto_efectivo:s.monto_efectivo,
+                pacas_factura:s.pacas_factura, pacas_promo:s.pacas_promo, pacas_totales:s.pacas_totales,
+                precio_real_paca:s.precio_real_paca, precio_nuevo_bruto:s.precio_nuevo_bruto, precio_nuevo_neto:s.precio_nuevo_neto,
+                pacas_a_reconocer:s.pacas_a_reconocer,
+                unidad_antes:s.unidad_antes||null, unidad_despues:s.unidad_despues||null, variacion_unidad_pct:s.variacion_unidad_pct,
+                diferencia_paca:s.diferencia_paca, total_compensar:s.total_compensar, pacas_a_entregar:s.pacas_a_entregar,
+                tipo_cierre:tipoCierre.toUpperCase(), precio_fijo_cliente:tipoCierre==='precio'?preciosFijos[i]:null,
+                fotos_inventario:urlsFotos
             });
         }
-
         setLoading(true, 'Guardando compensación...');
         const { error } = await sb.from('compensaciones').insert(filas);
         if (error) throw new Error(error.message);
-        setLoading(false);
-        showToast('¡Compensación guardada con éxito!', 'success');
-        resetCalc();
-        cerrarCalcModal();
-    } catch(e) {
-        setLoading(false);
-        showToast(e.message, 'error');
-    }
+        setLoading(false); showToast('¡Compensación guardada con éxito!', 'success');
+        resetCalc(); cerrarCalcModal();
+    } catch(e) { setLoading(false); showToast(e.message, 'error'); }
 });
 
 function resetCalc() {
-    document.getElementById('calc_promotor').value = '';
-    document.getElementById('calc_cliente').value  = '';
-    document.getElementById('calc_obs').value      = '';
-    skuContainer.innerHTML = '';
-    skuCount = 0;
-    addSkuCard(false);
+    document.getElementById('calc_promotor').value='';
+    document.getElementById('calc_cliente').value='';
+    document.getElementById('calc_obs').value='';
+    skuContainer.innerHTML=''; skuCount=0; addSkuCard(false);
     document.getElementById('resultadoComp').classList.add('hidden');
-    ultimoResultado = null; tipoCierre = null;
+    ultimoResultado=null; tipoCierre=null;
 }
 
-// ─── FAB / Modal ──────────────────────────────────────────────
-const fabCalc    = document.getElementById('fabCalc');
-const calcModal  = document.getElementById('calcModal');
-fabCalc.addEventListener('click', () => { calcModal.classList.add('activo'); document.body.style.overflow='hidden'; });
-function cerrarCalcModal() { calcModal.classList.remove('activo'); document.body.style.overflow=''; }
-document.getElementById('btnCloseCalc').addEventListener('click', cerrarCalcModal);
-calcModal.addEventListener('click', e => { if (e.target===calcModal) cerrarCalcModal(); });
+const fabCalc=document.getElementById('fabCalc'), calcModal=document.getElementById('calcModal');
+fabCalc.addEventListener('click',()=>{calcModal.classList.add('activo');document.body.style.overflow='hidden';});
+function cerrarCalcModal(){calcModal.classList.remove('activo');document.body.style.overflow='';}
+document.getElementById('btnCloseCalc').addEventListener('click',cerrarCalcModal);
+calcModal.addEventListener('click',e=>{if(e.target===calcModal)cerrarCalcModal();});
 
 // ─── Formulario POP ───────────────────────────────────────────
-const form          = document.getElementById('popForm');
-const btnSubmit     = document.getElementById('btnSubmit');
-const fotosGrid     = document.getElementById('fotos-grid');
-const contadorFotos = document.getElementById('contador-fotos');
-const loadingModal  = document.getElementById('loadingModal');
-const loadingStatus = document.getElementById('loadingStatus');
-let fotosArray      = [];
-
-document.getElementById('btnCamera').addEventListener('click',  () => document.getElementById('cameraInput').click());
-document.getElementById('btnGallery').addEventListener('click', () => document.getElementById('galleryInput').click());
-
-function onFilesSelected(e) {
-    const files = Array.from(e.target.files||[]);
-    if (!files.length) return;
-    fotosArray.push(...files); renderFotos(); e.target.value='';
-}
-document.getElementById('cameraInput').addEventListener('change',  onFilesSelected);
-document.getElementById('galleryInput').addEventListener('change', onFilesSelected);
-
-function renderFotos() {
+const form=document.getElementById('popForm'), btnSubmit=document.getElementById('btnSubmit'),
+      fotosGrid=document.getElementById('fotos-grid'), contadorFotos=document.getElementById('contador-fotos'),
+      loadingModal=document.getElementById('loadingModal'), loadingStatus=document.getElementById('loadingStatus');
+let fotosArray=[];
+document.getElementById('btnCamera').addEventListener('click',()=>document.getElementById('cameraInput').click());
+document.getElementById('btnGallery').addEventListener('click',()=>document.getElementById('galleryInput').click());
+function onFilesSelected(e){const files=Array.from(e.target.files||[]);if(!files.length)return;fotosArray.push(...files);renderFotos();e.target.value='';}
+document.getElementById('cameraInput').addEventListener('change',onFilesSelected);
+document.getElementById('galleryInput').addEventListener('change',onFilesSelected);
+function renderFotos(){
     fotosGrid.innerHTML='';
-    if (fotosArray.length>0) {
-        fotosGrid.classList.remove('hidden');
-        contadorFotos.textContent=`${fotosArray.length} foto${fotosArray.length!==1?'s':''}`;
-        contadorFotos.className='text-xs font-semibold text-brand-600 bg-brand-100 px-2 py-1 rounded-md';
-    } else {
-        fotosGrid.classList.add('hidden');
-        contadorFotos.textContent='0 fotos';
-        contadorFotos.className='text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md';
-    }
-    fotosArray.forEach((file,index) => {
-        const reader=new FileReader();
-        reader.onload=({target})=>{
-            const div=document.createElement('div');
-            div.className='relative rounded-xl overflow-hidden shadow-sm border border-gray-200 aspect-square bg-gray-50';
-            div.innerHTML=`<img src="${target.result}" class="w-full h-full object-cover" loading="lazy">
-                <button type="button" data-idx="${index}" class="btn-del absolute top-1 right-1 bg-red-500 text-white p-1.5 rounded-full shadow-lg transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                </button>`;
-            fotosGrid.appendChild(div);
-            div.querySelector('.btn-del').addEventListener('click',function(){ fotosArray.splice(parseInt(this.dataset.idx),1); renderFotos(); });
-        };
-        reader.readAsDataURL(file);
-    });
+    if(fotosArray.length>0){fotosGrid.classList.remove('hidden');contadorFotos.textContent=`${fotosArray.length} foto${fotosArray.length!==1?'s':''}`;contadorFotos.className='text-xs font-semibold text-brand-600 bg-brand-100 px-2 py-1 rounded-md';}
+    else{fotosGrid.classList.add('hidden');contadorFotos.textContent='0 fotos';contadorFotos.className='text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md';}
+    fotosArray.forEach((file,index)=>{const reader=new FileReader();reader.onload=({target})=>{const div=document.createElement('div');div.className='relative rounded-xl overflow-hidden shadow-sm border border-gray-200 aspect-square bg-gray-50';div.innerHTML=`<img src="${target.result}" class="w-full h-full object-cover" loading="lazy"><button type="button" data-idx="${index}" class="btn-del absolute top-1 right-1 bg-red-500 text-white p-1.5 rounded-full shadow-lg transition"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>`;fotosGrid.appendChild(div);div.querySelector('.btn-del').addEventListener('click',function(){fotosArray.splice(parseInt(this.dataset.idx),1);renderFotos();});};reader.readAsDataURL(file);});
 }
-
 form.addEventListener('submit', async e => {
     e.preventDefault();
-    const promotorNombre = document.getElementById('promotor').value;
-    const cliente        = document.getElementById('cliente').value.trim();
-    const estado         = document.getElementById('estado').value;
-    const materiales     = Array.from(document.querySelectorAll('.mat-check:checked')).map(cb=>cb.value);
-    if (!promotorNombre)         return showToast('El campo Promotor es requerido.','error');
-    if (!cliente)                return showToast('El campo Cliente es requerido.','error');
-    if (!estado)                 return showToast('Debe seleccionar un estado.','error');
-    if (materiales.length===0)   return showToast('Seleccione al menos un material POP.','error');
-    if (fotosArray.length===0)   return showToast('Tome al menos una foto de evidencia.','error');
+    const promotorNombre=document.getElementById('promotor').value, cliente=document.getElementById('cliente').value.trim(),
+          estado=document.getElementById('estado').value, materiales=Array.from(document.querySelectorAll('.mat-check:checked')).map(cb=>cb.value);
+    if(!promotorNombre)return showToast('El campo Promotor es requerido.','error');
+    if(!cliente)return showToast('El campo Cliente es requerido.','error');
+    if(!estado)return showToast('Debe seleccionar un estado.','error');
+    if(materiales.length===0)return showToast('Seleccione al menos un material POP.','error');
+    if(fotosArray.length===0)return showToast('Tome al menos una foto de evidencia.','error');
     setLoading(true,'Verificando promotor...');
-    try {
+    try{
         await sb.from('sorteo_promotores').upsert([{nombre:promotorNombre}],{onConflict:'nombre'});
         const urlsFotos=[];
         for(let i=0;i<fotosArray.length;i++){
             setLoading(true,`Subiendo foto ${i+1} de ${fotosArray.length}...`);
-            const file=fotosArray[i];
-            const ext=(file.name.split('.').pop()||'jpg').toLowerCase();
-            const fileName=`${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
+            const file=fotosArray[i],ext=(file.name.split('.').pop()||'jpg').toLowerCase(),fileName=`${Date.now()}_${Math.random().toString(36).slice(2,7)}.${ext}`;
             const {data:stData,error:stError}=await sb.storage.from('evidencias').upload(fileName,file,{cacheControl:'3600',upsert:false});
-            if(stError) throw new Error(`Error foto #${i+1}: ${stError.message}`);
-            const {data:{publicUrl}}=sb.storage.from('evidencias').getPublicUrl(stData.path);
-            urlsFotos.push(publicUrl);
+            if(stError)throw new Error(`Error foto #${i+1}: ${stError.message}`);
+            const {data:{publicUrl}}=sb.storage.from('evidencias').getPublicUrl(stData.path);urlsFotos.push(publicUrl);
         }
         setLoading(true,'Guardando registro...');
-        const {error:dbError}=await sb.from('sorteo_registros').insert([{
-            promotor_nombre:promotorNombre, cliente_nombre:cliente,
-            estado, materiales_entregados:materiales, fotos_urls:urlsFotos
-        }]);
-        if(dbError) throw new Error(dbError.message);
-        setLoading(false);
-        showToast('¡Visita registrada con éxito!','success');
-        form.reset(); fotosArray=[]; renderFotos();
-    } catch(err){ setLoading(false); showToast(err.message,'error'); }
+        const {error:dbError}=await sb.from('sorteo_registros').insert([{promotor_nombre:promotorNombre,cliente_nombre:cliente,estado,materiales_entregados:materiales,fotos_urls:urlsFotos}]);
+        if(dbError)throw new Error(dbError.message);
+        setLoading(false);showToast('¡Visita registrada con éxito!','success');
+        form.reset();fotosArray=[];renderFotos();
+    }catch(err){setLoading(false);showToast(err.message,'error');}
 });
-
-// ─── Helpers ──────────────────────────────────────────────────
-function setLoading(show,texto='Procesando...'){
-    if(show){ loadingModal.classList.add('activo'); loadingStatus.textContent=texto; btnSubmit.disabled=true; }
-    else    { loadingModal.classList.remove('activo'); btnSubmit.disabled=false; loadingStatus.textContent='Iniciando'; }
-}
-function showToast(message,type='error'){
-    const toast=document.getElementById('toast');
-    document.getElementById('toastMessage').textContent=message;
-    document.getElementById('toastIconSuccess').classList.toggle('hidden',type!=='success');
-    document.getElementById('toastIconError').classList.toggle('hidden',type!=='error');
-    toast.classList.remove('-translate-y-24','opacity-0');
-    toast.classList.add('translate-y-0','opacity-100');
-    setTimeout(()=>{ toast.classList.remove('translate-y-0','opacity-100'); toast.classList.add('-translate-y-24','opacity-0'); },3500);
-}
+function setLoading(show,texto='Procesando...'){if(show){loadingModal.classList.add('activo');loadingStatus.textContent=texto;btnSubmit.disabled=true;}else{loadingModal.classList.remove('activo');btnSubmit.disabled=false;loadingStatus.textContent='Iniciando';}}
+function showToast(message,type='error'){const toast=document.getElementById('toast');document.getElementById('toastMessage').textContent=message;document.getElementById('toastIconSuccess').classList.toggle('hidden',type!=='success');document.getElementById('toastIconError').classList.toggle('hidden',type!=='error');toast.classList.remove('-translate-y-24','opacity-0');toast.classList.add('translate-y-0','opacity-100');setTimeout(()=>{toast.classList.remove('translate-y-0','opacity-100');toast.classList.add('-translate-y-24','opacity-0');},3500);}
 </script>
 
 </body>
