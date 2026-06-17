@@ -67,14 +67,12 @@
         }
         .sku-remove:hover { background:#fecaca; }
 
-        /* resultado card */
         .res-sku-block {
             border-left:3px solid #f59e0b;
             padding-left:12px; margin-bottom:14px;
         }
         .res-sku-block:last-child { margin-bottom:0; }
 
-        /* toggle cierre */
         .cierre-btn {
             flex:1; padding:10px 6px; font-size:12px; font-weight:700;
             border:2px solid #e5e7eb; border-radius:12px;
@@ -118,10 +116,6 @@
         .res-row.highlight .lbl { font-weight:600; color:#374151; }
         .res-row.highlight .val { font-size:18px; font-weight:800; color:#b45309; }
 
-        .badge-residuo {
-            background:#fff7ed; border:1px solid #fed7aa;
-            border-radius:10px; padding:8px 12px; margin-top:6px; font-size:12px;
-        }
         .badge-pedido {
             background:#eff6ff; border:1px solid #bfdbfe;
             border-radius:10px; padding:8px 12px; margin-top:6px; font-size:12px;
@@ -139,7 +133,6 @@
 </head>
 <body class="bg-brand-50 text-brand-900 font-sans antialiased min-h-screen pb-24">
 
-<!-- ═══ HEADER ════════════════════════════════════════════════ -->
 <header class="bg-white shadow-sm sticky top-0 z-40 border-b border-gray-100">
     <nav class="max-w-lg mx-auto px-4 py-4 flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -152,7 +145,6 @@
     </nav>
 </header>
 
-<!-- ═══ MAIN ══════════════════════════════════════════════════ -->
 <main class="max-w-lg mx-auto p-4">
     <div class="mb-6">
         <h1 class="text-2xl font-extrabold tracking-tight">Registro de Visita</h1>
@@ -246,7 +238,6 @@
     </form>
 </main>
 
-<!-- ═══ FAB ═══════════════════════════════════════════════════ -->
 <button id="fabCalc" title="Calculadora de Compensación">
     <svg width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
         <rect x="4" y="2" width="16" height="20" rx="2"/>
@@ -257,11 +248,9 @@
     </svg>
 </button>
 
-<!-- ═══ MODAL CALCULADORA ════════════════════════════════════ -->
 <div id="calcModal" class="fixed inset-0 bg-gray-900/60 backdrop-blur-sm z-[900]">
   <div id="calcModalPanel" class="bg-gray-50 w-full max-w-lg mx-auto rounded-t-3xl shadow-2xl max-h-[94vh] overflow-y-auto pb-10">
 
-    <!-- Header -->
     <div class="sticky top-0 bg-white rounded-t-3xl pt-3 pb-4 px-5 border-b border-gray-100 z-10">
         <div class="w-10 h-1 bg-gray-200 rounded-full mx-auto mb-4"></div>
         <div class="flex items-center justify-between">
@@ -282,7 +271,6 @@
 
     <div class="px-5 pt-5 space-y-4">
 
-        <!-- Vendedor y cliente -->
         <div class="bg-white rounded-2xl border border-gray-100 p-4 space-y-3 shadow-sm">
             <p class="text-xs font-bold text-brand-700 uppercase tracking-wider">Datos de la visita</p>
             <div>
@@ -307,30 +295,25 @@
             </div>
         </div>
 
-        <!-- SKU Container -->
-                <div id="skuContainer"></div>
+        <div id="skuContainer"></div>
 
-        <!-- Botón + SKU -->
         <button type="button" id="btnAddSku"
             class="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-amber-300 hover:border-amber-400 hover:bg-amber-50 text-amber-700 font-bold text-sm rounded-xl transition">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"/></svg>
             Agregar otro SKU
         </button>
 
-        <!-- Observaciones -->
         <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
             <label class="field-label">Observaciones <span class="field-sub">(opcional)</span></label>
             <textarea id="calc_obs" rows="2" placeholder="Notas adicionales..." class="input-base mt-1 resize-none" style="border-color:#e5e7eb;"></textarea>
         </div>
 
-        <!-- Botón calcular -->
         <button type="button" id="btnCalcCalc"
             class="w-full flex items-center justify-center gap-2 bg-amber-500 hover:bg-amber-600 active:scale-[0.98] text-white py-4 rounded-xl font-bold text-base transition shadow-lg shadow-amber-100">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 11h.01M12 11h.01M15 11h.01M4 19h16a2 2 0 002-2V7a2 2 0 00-2-2H4a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             Ver Resumen y Guardar
         </button>
 
-        <!-- Resultado -->
         <div id="resultadoComp" class="hidden space-y-3">
             <div class="bg-white rounded-2xl border border-amber-200 shadow-sm overflow-hidden">
                 <div class="bg-amber-500 px-4 py-3 flex items-center gap-2">
@@ -340,7 +323,6 @@
                 <div id="resDesglose" class="p-4 space-y-4"></div>
             </div>
 
-            <!-- Cierre -->
             <div class="bg-white rounded-2xl border border-gray-100 p-4 shadow-sm">
                 <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">¿Cómo se cierra la compensación?</p>
                 <div class="flex gap-2 mb-3">
@@ -377,7 +359,6 @@
 </div>
 
 
-<!-- LOADING -->
 <div id="loadingModal" class="fixed inset-0 bg-gray-900/70 backdrop-blur-sm z-[999]">
     <div class="bg-white p-8 rounded-2xl flex flex-col items-center shadow-2xl w-10/12 max-w-sm text-center">
         <div class="w-14 h-14 border-4 border-brand-100 border-t-brand-600 rounded-full animate-spin mb-4"></div>
@@ -386,7 +367,6 @@
     </div>
 </div>
 
-<!-- TOAST -->
 <div id="toast" class="fixed top-5 left-1/2 -translate-x-1/2 z-[1000] -translate-y-24 opacity-0 transition-all duration-300 ease-out w-11/12 max-w-sm pointer-events-none">
     <div class="flex items-center gap-3 bg-gray-900 text-white px-5 py-4 rounded-xl shadow-2xl">
         <div id="toastIconSuccess" class="hidden shrink-0 text-green-400"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg></div>
@@ -427,7 +407,6 @@ function addSkuCard(scroll=false) {
         ${id>1?`<button type="button" class="sku-remove" title="Eliminar"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg></button>`:''}
 
         <div class="space-y-3">
-            <!-- Producto -->
             <div>
                 <label class="field-label">Producto</label>
                 <div class="select-wrap">
@@ -442,98 +421,100 @@ function addSkuCard(scroll=false) {
                 <input type="text" class="sku-factura input-base" placeholder="Ej: FAC-2024-001" data-id="${id}">
             </div>
 
-            <!-- ══ PASO 1: PRECIO AL QUE SE VENDIÓ (ORIGINAL) ══ -->
             <div style="background:#eff6ff;border:1.5px solid #bae6fd;border-radius:14px;padding:12px;">
-                <p style="font-size:11px;font-weight:800;color:#0369a1;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">1️⃣ Precio al que se vendió</p>
-                <p style="font-size:11px;color:#0369a1;opacity:.75;margin-bottom:10px;">Lo que pagó el cliente en su momento (con promo y pronto pago).</p>
-                <div class="space-y-3">
-                    <div>
-                        <label class="field-label">Monto total de la factura <span class="field-sub">($)</span></label>
-                        <div class="input-prefix"><span>$</span>
-                            <input type="number" class="sku-monto-factura input-base" min="0" step="0.01" placeholder="0.00" data-id="${id}" style="border-color:#bae6fd;">
-                        </div>
-                    </div>
-                    <div>
-                        <label class="field-label">Condición de pago</label>
-                        <div class="select-wrap">
-                            <select class="sku-condicion input-base" data-id="${id}" style="border-color:#bae6fd;">
-                                <option value="0">Precio full (sin descuento)</option>
-                                <option value="2">Pronto pago 2%</option>
-                                <option value="4">Pronto pago 4%</option>
-                                <option value="6">Pronto pago 6%</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="grid2">
-                        <div>
-                            <label class="field-label">Pacas facturadas</label>
-                            <input type="number" class="sku-pacas-total input-base" min="1" step="1" placeholder="Ej: 150" data-id="${id}" style="border-color:#bae6fd;">
-                        </div>
-                        <div>
-                            <label class="field-label">Pacas de promoción</label>
-                            <input type="number" class="sku-promo-pacas input-base" min="0" step="1" placeholder="0" value="0" data-id="${id}" style="border-color:#bae6fd;">
-                        </div>
-                    </div>
-                    <div class="sku-precio-real-wrap hidden" data-id="${id}" style="background:white;border-radius:10px;padding:8px 12px;">
-                        <div class="flex justify-between items-center">
-                            <span style="font-size:12px;color:#0369a1;font-weight:700;">💲 Precio real pagado / paca</span>
-                            <span class="sku-precio-real-val" style="font-size:16px;font-weight:800;color:#0369a1;">—</span>
-                        </div>
-                        <p class="sku-precio-real-formula" style="font-size:10px;color:#9ca3af;margin-top:2px;"></p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ══ PASO 2: PRECIO NUEVO (RECONOCIMIENTO) ══ -->
-            <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:14px;padding:12px;">
-                <p style="font-size:11px;font-weight:800;color:#b45309;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">2️⃣ Precio nuevo por paca</p>
-                <p style="font-size:11px;color:#b45309;opacity:.75;margin-bottom:10px;">Precio actual de mercado (siempre menor). Se le aplica la misma promo y pronto pago.</p>
-                <div class="space-y-3">
-                    <div>
-                        <label class="field-label">Precio nuevo por paca <span class="field-sub">($ bruto actual)</span></label>
-                        <div class="input-prefix"><span>$</span>
-                            <input type="number" class="sku-precio-nuevo input-base" min="0" step="0.01" placeholder="0.00" data-id="${id}" style="border-color:#fde68a;">
-                        </div>
-                    </div>
-                    <div class="sku-precio-neto-wrap hidden" data-id="${id}" style="background:white;border-radius:10px;padding:8px 12px;">
-                        <div class="flex justify-between items-center">
-                            <span style="font-size:12px;color:#16a34a;font-weight:700;">✅ Precio nuevo neto / paca</span>
-                            <span class="sku-precio-neto-val" style="font-size:16px;font-weight:800;color:#16a34a;">—</span>
-                        </div>
-                        <p class="sku-precio-neto-formula" style="font-size:10px;color:#9ca3af;margin-top:2px;"></p>
-                    </div>
-                    <div>
-                        <label class="field-label">Pacas a reconocer <span class="field-sub">(esta visita)</span></label>
-                        <input type="number" class="sku-pacas-reconocer input-base" min="1" step="1" placeholder="Ej: 80" data-id="${id}" style="border-color:#fde68a;">
-                    </div>
-                </div>
-            </div>
-
-            <!-- ══ PASO 3: PRECIO POR UNIDAD (REFERENCIA) ══ -->
-            <div style="background:#f5f3ff;border:1.5px solid #ddd6fe;border-radius:14px;padding:12px;">
-                <p style="font-size:11px;font-weight:800;color:#6d28d9;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">3️⃣ Precio por unidad <span style="font-weight:600;opacity:.7;">(referencia)</span></p>
-                <p style="font-size:11px;color:#6d28d9;opacity:.75;margin-bottom:10px;">A cuánto vende la unidad al público, antes y después.</p>
+                <p style="font-size:11px;font-weight:800;color:#0369a1;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">1️⃣ Primera parte (Precio Viejo)</p>
+                <p style="font-size:11px;color:#0369a1;opacity:.75;margin-bottom:10px;">Valores al momento de la compra.</p>
+                
                 <div class="grid2">
                     <div>
-                        <label class="field-label">Precio unidad ANTES</label>
-                        <div class="input-prefix"><span>$</span>
-                            <input type="number" class="sku-unidad-antes input-base" min="0" step="0.01" placeholder="0.00" data-id="${id}" style="border-color:#ddd6fe;">
-                        </div>
+                        <label class="field-label">Cant. Pacas</label>
+                        <input type="number" class="sku-p1-pacas input-base" min="1" step="1" placeholder="Ej: 50" data-id="${id}" style="border-color:#bae6fd;">
                     </div>
                     <div>
-                        <label class="field-label">Precio unidad DESPUÉS</label>
+                        <label class="field-label">Precio / Paca</label>
                         <div class="input-prefix"><span>$</span>
-                            <input type="number" class="sku-unidad-despues input-base" min="0" step="0.01" placeholder="0.00" data-id="${id}" style="border-color:#ddd6fe;">
+                            <input type="number" class="sku-p1-precio input-base" min="0" step="0.01" placeholder="0.00" data-id="${id}" style="border-color:#bae6fd;">
                         </div>
                     </div>
                 </div>
-                <div class="sku-variacion-wrap hidden" data-id="${id}" style="background:white;border-radius:10px;padding:8px 12px;margin-top:8px;display:flex;justify-content:space-between;align-items:center;">
-                    <span style="font-size:12px;color:#6d28d9;font-weight:700;">Variación precio unidad</span>
-                    <span class="sku-variacion-val" style="font-size:15px;font-weight:800;">—</span>
+                
+                <div class="mt-3">
+                    <label class="field-label">Pacas en Promoción <span class="field-sub">(costo $0)</span></label>
+                    <input type="number" class="sku-p1-promo input-base" min="0" step="1" placeholder="0" value="0" data-id="${id}" style="border-color:#bae6fd;">
+                </div>
+
+                <div class="sku-p1-res-wrap hidden" data-id="${id}" style="background:white;border-radius:10px;padding:8px 12px;margin-top:12px;">
+                    <div class="flex justify-between items-center mb-1">
+                        <span style="font-size:11px;color:#6b7280;font-weight:600;">Subtotal ($)</span>
+                        <span class="sku-p1-subtotal" style="font-size:13px;font-weight:700;color:#374151;">—</span>
+                    </div>
+                    <div class="flex justify-between items-center border-t border-dashed border-blue-200 pt-1">
+                        <span style="font-size:12px;color:#0369a1;font-weight:700;">💲 Precio Final / Paca</span>
+                        <span class="sku-p1-neto" style="font-size:16px;font-weight:800;color:#0369a1;">—</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Fotos de inventario -->
+            <div style="background:#fffbeb;border:1.5px solid #fde68a;border-radius:14px;padding:12px;">
+                <p style="font-size:11px;font-weight:800;color:#b45309;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">2️⃣ Segunda parte (Precio Nuevo)</p>
+                <p style="font-size:11px;color:#b45309;opacity:.75;margin-bottom:10px;">Valores actuales del mercado.</p>
+                
+                <div class="grid2">
+                    <div>
+                        <label class="field-label">Cant. Pacas <span class="field-sub">(Ref)</span></label>
+                        <input type="number" class="sku-p2-pacas input-base" min="1" step="1" placeholder="Ej: 50" data-id="${id}" style="border-color:#fde68a;">
+                    </div>
+                    <div>
+                        <label class="field-label">Precio / Paca</label>
+                        <div class="input-prefix"><span>$</span>
+                            <input type="number" class="sku-p2-precio input-base" min="0" step="0.01" placeholder="0.00" data-id="${id}" style="border-color:#fde68a;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label class="field-label">Pacas en Promoción <span class="field-sub">(costo $0)</span></label>
+                    <input type="number" class="sku-p2-promo input-base" min="0" step="1" placeholder="0" value="0" data-id="${id}" style="border-color:#fde68a;">
+                </div>
+
+                <div class="sku-p2-res-wrap hidden" data-id="${id}" style="background:white;border-radius:10px;padding:8px 12px;margin-top:12px;">
+                    <div class="flex justify-between items-center mb-1">
+                        <span style="font-size:11px;color:#6b7280;font-weight:600;">Subtotal ($)</span>
+                        <span class="sku-p2-subtotal" style="font-size:13px;font-weight:700;color:#374151;">—</span>
+                    </div>
+                    <div class="flex justify-between items-center border-t border-dashed border-amber-200 pt-1">
+                        <span style="font-size:12px;color:#16a34a;font-weight:700;">✅ Precio Final / Paca</span>
+                        <span class="sku-p2-neto" style="font-size:16px;font-weight:800;color:#16a34a;">—</span>
+                    </div>
+                </div>
+
+                <div class="mt-3 pt-3" style="border-top:1.5px solid #fcd34d;">
+                    <label class="field-label">Pacas a reconocer <span class="field-sub">(Inventario del cliente)</span></label>
+                    <input type="number" class="sku-pacas-reconocer input-base" min="1" step="1" placeholder="Ej: 20" data-id="${id}" style="border-color:#fde68a;">
+                </div>
+            </div>
+
+            <div style="background:#f5f3ff;border:1.5px solid #ddd6fe;border-radius:14px;padding:12px;">
+                <p style="font-size:11px;font-weight:800;color:#6d28d9;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">3️⃣ Precio por unidad <span style="font-weight:600;opacity:.7;">(Automático)</span></p>
+                <p style="font-size:11px;color:#6d28d9;opacity:.75;margin-bottom:10px;">Calculado a partir de los precios finales.</p>
+                
+                <div class="mb-3">
+                    <label class="field-label">Unidades por paca</label>
+                    <input type="number" class="sku-unidades-paca input-base" min="1" step="1" value="20" data-id="${id}" style="border-color:#ddd6fe;">
+                </div>
+
+                <div class="sku-unidades-wrap hidden" data-id="${id}" style="background:white;border-radius:10px;padding:8px 12px;margin-top:8px;">
+                    <div class="grid2" style="margin-bottom:6px;">
+                        <div style="font-size:12px;"><span style="color:#6b7280;">Antes:</span> <span class="sku-u-antes font-bold text-gray-800">—</span></div>
+                        <div style="font-size:12px;"><span style="color:#6b7280;">Después:</span> <span class="sku-u-despues font-bold text-gray-800">—</span></div>
+                    </div>
+                    <div class="flex justify-between items-center pt-2" style="border-top:1px dashed #e5e7eb;">
+                        <span style="font-size:12px;color:#6d28d9;font-weight:700;">Variación</span>
+                        <span class="sku-u-var" style="font-size:14px;font-weight:800;">—</span>
+                    </div>
+                </div>
+            </div>
+
             <div>
                 <label class="field-label">Fotos de inventario</label>
                 <div class="flex items-center gap-2 mt-1">
@@ -552,18 +533,15 @@ function addSkuCard(scroll=false) {
                 <div class="sku-fotos-grid hidden mt-2 grid grid-cols-3 gap-2" data-id="${id}"></div>
             </div>
 
-            <!-- RESULTADO -->
             <div class="sku-resultado hidden" data-id="${id}" style="background:linear-gradient(135deg,#fffbeb,#fff7ed);border:1.5px solid #fcd34d;border-radius:14px;padding:12px;">
                 <p style="font-size:11px;font-weight:800;color:#b45309;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">⚡ Resultado</p>
                 <div class="space-y-1">
-                    <div class="res-row"><span class="lbl">Precio real pagado / paca</span><span class="sku-r-real val">—</span></div>
-                    <div class="res-row"><span class="lbl">Precio nuevo neto / paca</span><span class="sku-r-neto val" style="color:#16a34a;">—</span></div>
-                    <div class="res-row" style="border-top:1px dashed #fde68a;padding-top:5px;margin-top:3px;">
-                        <span class="lbl font-semibold">Diferencia / paca</span><span class="sku-r-dif val" style="color:#d97706;">—</span>
-                    </div>
+                    <div class="res-row"><span class="lbl">Diferencia / paca ($)</span><span class="sku-r-dif val">—</span></div>
                     <div class="res-row"><span class="lbl">Pacas a reconocer</span><span class="sku-r-recon val">—</span></div>
-                    <div class="res-row"><span class="lbl">Total a compensar</span><span class="sku-r-total val" style="color:#b45309;">—</span></div>
-                    <div class="res-row highlight"><span class="lbl">Pacas a entregar ↓</span><span class="sku-r-pacas val">—</span></div>
+                    <div class="res-row highlight" style="padding-top:4px; margin-top:2px;">
+                        <span class="lbl">Total a compensar</span><span class="sku-r-total val" style="color:#b45309; font-size:16px;">—</span>
+                    </div>
+                    <div class="res-row highlight"><span class="lbl">Pacas a entregar ↓</span><span class="sku-r-pacas val" style="font-size:20px; color:#16a34a;">—</span></div>
                 </div>
             </div>
         </div>
@@ -574,47 +552,54 @@ function addSkuCard(scroll=false) {
     if (rb) rb.addEventListener('click', () => { card.remove(); renumberSkus(); });
 
     const $ = cls => card.querySelector(cls);
-    const inpMonto    = $('.sku-monto-factura');
-    const inpCond     = $('.sku-condicion');
-    const inpPacas    = $('.sku-pacas-total');
-    const inpPromo    = $('.sku-promo-pacas');
-    const inpNuevo    = $('.sku-precio-nuevo');
+    
+    const inpP1Pacas  = $('.sku-p1-pacas');
+    const inpP1Precio = $('.sku-p1-precio');
+    const inpP1Promo  = $('.sku-p1-promo');
+    
+    const inpP2Pacas  = $('.sku-p2-pacas');
+    const inpP2Precio = $('.sku-p2-precio');
+    const inpP2Promo  = $('.sku-p2-promo');
+    
     const inpRecon    = $('.sku-pacas-reconocer');
-    const inpUAntes   = $('.sku-unidad-antes');
-    const inpUDespues = $('.sku-unidad-despues');
+    const inpUnidades = $('.sku-unidades-paca');
 
     function computar() {
-        const monto = parseFloat(inpMonto.value) || 0;
-        const desc  = parseFloat(inpCond.value)  || 0;
-        const pacas = parseInt(inpPacas.value)   || 0;
-        const promo = parseInt(inpPromo.value)   || 0;
-        const total = pacas + promo;
-        const fDesc = (1 - desc/100);
-        const fPromo= total > 0 ? (pacas / total) : 1;
+        // P1 variables
+        const p1Pacas  = parseInt(inpP1Pacas.value)  || 0;
+        const p1Precio = parseFloat(inpP1Precio.value)|| 0;
+        const p1Promo  = parseInt(inpP1Promo.value)  || 0;
+        
+        const p1TotalDol = r2(p1Pacas * p1Precio);
+        const p1TotalPac = p1Pacas + p1Promo;
+        const p1Neto     = p1TotalPac > 0 ? r2(p1TotalDol / p1TotalPac) : 0;
 
-        // Paso 1: precio real original neto
-        const montoEfect = r2(monto * fDesc);
-        const precioReal = total > 0 ? r2(montoEfect / total) : 0;
-
-        // Paso 2: precio nuevo neto (mismos condicionales)
-        const precioNuevoBruto = parseFloat(inpNuevo.value) || 0;
-        const precioNuevoNeto  = r2(precioNuevoBruto * fDesc * fPromo);
+        // P2 variables
+        const p2Pacas  = parseInt(inpP2Pacas.value)  || 0;
+        const p2Precio = parseFloat(inpP2Precio.value)|| 0;
+        const p2Promo  = parseInt(inpP2Promo.value)  || 0;
+        
+        const p2TotalDol = r2(p2Pacas * p2Precio);
+        const p2TotalPac = p2Pacas + p2Promo;
+        const p2Neto     = p2TotalPac > 0 ? r2(p2TotalDol / p2TotalPac) : 0;
 
         const pacasRecon = parseInt(inpRecon.value) || 0;
+        const unidades   = parseInt(inpUnidades.value) || 20;
 
-        // Paso 3: diferencia y pacas a entregar (con el precio nuevo neto)
-        const difPaca   = r2(precioReal - precioNuevoNeto);
+        // Cálculos
+        const difPaca   = r2(p1Neto - p2Neto);
         const totalComp = r2(difPaca * pacasRecon);
-        const pacasEnt  = (difPaca > 0 && precioNuevoNeto > 0) ? Math.floor(totalComp / precioNuevoNeto) : 0;
+        const pacasEnt  = (difPaca > 0 && p2Neto > 0) ? Math.floor(totalComp / p2Neto) : 0;
 
-        // Referencia: variación precio unidad
-        const uAntes   = parseFloat(inpUAntes.value)   || 0;
-        const uDespues = parseFloat(inpUDespues.value) || 0;
-        const variacion = (uAntes > 0 && uDespues > 0) ? r2(((uDespues - uAntes)/uAntes)*100) : null;
+        // Unidades
+        const uAntes   = p1Neto > 0 ? r2(p1Neto / unidades) : 0;
+        const uDespues = p2Neto > 0 ? r2(p2Neto / unidades) : 0;
+        const variacion= (uAntes > 0 && uDespues > 0) ? r2(((uDespues - uAntes)/uAntes)*100) : null;
 
         return {
-            monto, desc, pacas, promo, total, fDesc, fPromo, montoEfect, precioReal,
-            precioNuevoBruto, precioNuevoNeto, pacasRecon, difPaca, totalComp, pacasEnt,
+            p1Pacas, p1Precio, p1Promo, p1TotalDol, p1TotalPac, p1Neto,
+            p2Pacas, p2Precio, p2Promo, p2TotalDol, p2TotalPac, p2Neto,
+            pacasRecon, unidades, difPaca, totalComp, pacasEnt,
             uAntes, uDespues, variacion
         };
     }
@@ -622,70 +607,64 @@ function addSkuCard(scroll=false) {
     function actualizar() {
         const c = computar();
 
-        // Precio real
-        const realWrap = $('.sku-precio-real-wrap');
-        if (c.monto > 0 && c.pacas > 0) {
-            $('.sku-precio-real-val').textContent = `$${c.precioReal.toFixed(2)}`;
-            $('.sku-precio-real-formula').textContent = c.desc > 0
-                ? `($${c.monto.toFixed(2)} × ${100-c.desc}%) ÷ ${c.total} pacas`
-                : `$${c.monto.toFixed(2)} ÷ ${c.total} pacas`;
-            realWrap.classList.remove('hidden');
-        } else realWrap.classList.add('hidden');
+        // Step 1 UI
+        const p1Wrap = $('.sku-p1-res-wrap');
+        if (c.p1TotalPac > 0 && c.p1TotalDol > 0) {
+            $('.sku-p1-subtotal').textContent = `$${c.p1TotalDol.toFixed(2)}`;
+            $('.sku-p1-neto').textContent = `$${c.p1Neto.toFixed(2)}`;
+            p1Wrap.classList.remove('hidden');
+        } else { p1Wrap.classList.add('hidden'); }
 
-        // Precio nuevo neto
-        const netoWrap = $('.sku-precio-neto-wrap');
-        if (c.precioNuevoBruto > 0 && c.total > 0) {
-            $('.sku-precio-neto-val').textContent = `$${c.precioNuevoNeto.toFixed(2)}`;
-            const rebaja = r2(c.precioNuevoBruto - c.precioNuevoNeto);
-            const partes = [];
-            if (c.desc > 0)  partes.push(`pronto pago ${c.desc}%`);
-            if (c.promo > 0) partes.push(`promo ${c.promo}/${c.total}`);
-            if (partes.length) {
-                $('.sku-precio-neto-formula').innerHTML =
-                    `$${c.precioNuevoBruto.toFixed(2)} bruto − <b style="color:#dc2626;">$${rebaja.toFixed(2)}</b> (${partes.join(' + ')})`;
+        // Step 2 UI
+        const p2Wrap = $('.sku-p2-res-wrap');
+        if (c.p2TotalPac > 0 && c.p2TotalDol > 0) {
+            $('.sku-p2-subtotal').textContent = `$${c.p2TotalDol.toFixed(2)}`;
+            $('.sku-p2-neto').textContent = `$${c.p2Neto.toFixed(2)}`;
+            p2Wrap.classList.remove('hidden');
+        } else { p2Wrap.classList.add('hidden'); }
+
+        // Step 3 Units UI
+        const uWrap = $('.sku-unidades-wrap');
+        if (c.uAntes > 0 || c.uDespues > 0) {
+            $('.sku-u-antes').textContent = `$${c.uAntes.toFixed(2)}`;
+            $('.sku-u-despues').textContent = `$${c.uDespues.toFixed(2)}`;
+            
+            if (c.variacion !== null) {
+                const signo = c.variacion >= 0 ? '+' : '';
+                $('.sku-u-var').textContent = `${signo}${c.variacion.toFixed(2)}%`;
+                $('.sku-u-var').style.color = c.variacion >= 0 ? '#16a34a' : '#dc2626';
             } else {
-                $('.sku-precio-neto-formula').innerHTML =
-                    `Esta factura no tuvo descuentos → neto = bruto`;
+                $('.sku-u-var').textContent = '—';
             }
-            netoWrap.classList.remove('hidden');
-        } else netoWrap.classList.add('hidden');
+            uWrap.classList.remove('hidden');
+        } else { uWrap.classList.add('hidden'); }
 
-        // Variación unidad
-        const varWrap = $('.sku-variacion-wrap');
-        if (c.variacion !== null) {
-            const signo = c.variacion >= 0 ? '+' : '';
-            $('.sku-variacion-val').textContent = `${signo}${c.variacion.toFixed(2)}%`;
-            $('.sku-variacion-val').style.color = c.variacion >= 0 ? '#16a34a' : '#dc2626';
-            varWrap.classList.remove('hidden');
-        } else varWrap.classList.add('hidden');
-
-        // Resultado
+        // Resultado Final
         const resBloque = $('.sku-resultado');
-        if (c.precioReal > 0 && c.precioNuevoNeto > 0 && c.pacasRecon > 0) {
+        if (c.p1Neto > 0 && c.p2Neto > 0 && c.pacasRecon > 0) {
             resBloque.classList.remove('hidden');
-            $('.sku-r-real').textContent  = `$${c.precioReal.toFixed(2)}`;
-            $('.sku-r-neto').textContent  = `$${c.precioNuevoNeto.toFixed(2)}`;
             $('.sku-r-recon').textContent = `${c.pacasRecon} pacas`;
+            
             if (c.difPaca > 0) {
-                $('.sku-r-dif').textContent   = `$${c.difPaca.toFixed(2)}/paca`;
+                $('.sku-r-dif').textContent   = `$${c.difPaca.toFixed(2)}`;
                 $('.sku-r-dif').style.color   = '#d97706';
                 $('.sku-r-total').textContent = `$${c.totalComp.toFixed(2)}`;
                 $('.sku-r-pacas').textContent = `${c.pacasEnt} paca${c.pacasEnt!==1?'s':''}`;
-                $('.sku-r-pacas').style.color = '#b45309';
+                $('.sku-r-pacas').style.color = '#16a34a';
             } else {
-                $('.sku-r-dif').textContent   = 'Sin diferencia';
+                $('.sku-r-dif').textContent   = 'Sin diferencia a favor';
                 $('.sku-r-dif').style.color   = '#6b7280';
                 $('.sku-r-total').textContent = '$0.00';
                 $('.sku-r-pacas').textContent = '0 pacas';
                 $('.sku-r-pacas').style.color = '#6b7280';
             }
-        } else resBloque.classList.add('hidden');
+        } else { resBloque.classList.add('hidden'); }
     }
 
-    [inpMonto,inpCond,inpPacas,inpPromo,inpNuevo,inpRecon,inpUAntes,inpUDespues]
+    [inpP1Pacas, inpP1Precio, inpP1Promo, inpP2Pacas, inpP2Precio, inpP2Promo, inpRecon, inpUnidades]
         .forEach(el => el.addEventListener('input', actualizar));
 
-    // Fotos
+    // Fotos (Se mantiene lógica original)
     const btnCam=$('.sku-btn-camara'), btnGal=$('.sku-btn-galeria'),
           inpCam=$('.sku-input-camara'), inpGal=$('.sku-input-galeria'),
           fGrid=$('.sku-fotos-grid'), fCount=$('.sku-foto-count');
@@ -705,13 +684,18 @@ function addSkuCard(scroll=false) {
     card._getCalc = () => {
         const c = computar();
         return {
-            producto: $('.sku-producto').value, factura: $('.sku-factura').value.trim(),
-            monto_factura:c.monto, descuento_pct:c.desc, monto_efectivo:c.montoEfect,
-            pacas_factura:c.pacas, pacas_promo:c.promo, pacas_totales:c.total,
-            precio_real_paca:c.precioReal, precio_nuevo_bruto:c.precioNuevoBruto, precio_nuevo_neto:c.precioNuevoNeto,
-            pacas_a_reconocer:c.pacasRecon,
-            unidad_antes:c.uAntes, unidad_despues:c.uDespues, variacion_unidad_pct:c.variacion,
-            diferencia_paca:c.difPaca, total_compensar:c.totalComp, pacas_a_entregar:c.pacasEnt
+            producto: $('.sku-producto').value, 
+            factura: $('.sku-factura').value.trim(),
+            // Paso 1
+            p1_pacas: c.p1Pacas, p1_precio: c.p1Precio, p1_promo: c.p1Promo, 
+            p1_total_dol: c.p1TotalDol, p1_neto: c.p1Neto,
+            // Paso 2
+            p2_pacas: c.p2Pacas, p2_precio: c.p2Precio, p2_promo: c.p2Promo,
+            p2_total_dol: c.p2TotalDol, p2_neto: c.p2Neto,
+            // Adicionales
+            pacas_a_reconocer: c.pacasRecon, unidades_por_paca: c.unidades,
+            unidad_antes: c.uAntes, unidad_despues: c.uDespues, variacion_unidad_pct: c.variacion,
+            diferencia_paca: c.difPaca, total_compensar: c.totalComp, pacas_a_entregar: c.pacasEnt
         };
     };
 
@@ -740,13 +724,12 @@ document.getElementById('btnCalcCalc').addEventListener('click', () => {
     cards.forEach((card, idx) => {
         if (err) return;
         const n = idx + 1, d = card._getCalc();
-        if (!d.producto)             { showToast(`SKU #${n}: seleccione un producto.`,'error'); err=true; return; }
-        if (!d.factura)              { showToast(`SKU #${n}: ingrese el número de factura.`,'error'); err=true; return; }
-        if (d.monto_factura<=0)      { showToast(`SKU #${n}: ingrese el monto de la factura.`,'error'); err=true; return; }
-        if (d.pacas_factura<1)       { showToast(`SKU #${n}: ingrese las pacas facturadas.`,'error'); err=true; return; }
-        if (d.precio_nuevo_bruto<=0) { showToast(`SKU #${n}: ingrese el precio nuevo por paca.`,'error'); err=true; return; }
-        if (d.pacas_a_reconocer<1)   { showToast(`SKU #${n}: ingrese las pacas a reconocer.`,'error'); err=true; return; }
-        if (d.precio_nuevo_neto>=d.precio_real_paca) { showToast(`SKU #${n}: el precio nuevo neto debe ser menor al precio real pagado.`,'error'); err=true; return; }
+        if (!d.producto)               { showToast(`SKU #${n}: seleccione un producto.`,'error'); err=true; return; }
+        if (!d.factura)                { showToast(`SKU #${n}: ingrese el número de factura.`,'error'); err=true; return; }
+        if (d.p1_pacas<1 || d.p1_precio<=0) { showToast(`SKU #${n}: complete los datos de la Primera Parte.`,'error'); err=true; return; }
+        if (d.p2_pacas<1 || d.p2_precio<=0) { showToast(`SKU #${n}: complete los datos de la Segunda Parte.`,'error'); err=true; return; }
+        if (d.pacas_a_reconocer<1)     { showToast(`SKU #${n}: ingrese las pacas a reconocer.`,'error'); err=true; return; }
+        if (d.p2_neto>=d.p1_neto)      { showToast(`SKU #${n}: el precio nuevo debe ser menor al precio viejo para compensar.`,'error'); err=true; return; }
         skusData.push({ ...d, n, fotos: card._getFotos() });
     });
     if (err) return;
@@ -760,8 +743,8 @@ document.getElementById('btnCalcCalc').addEventListener('click', () => {
         if (s.variacion_unidad_pct !== null) {
             const signo = s.variacion_unidad_pct >= 0 ? '+' : '';
             const color = s.variacion_unidad_pct >= 0 ? '#16a34a' : '#dc2626';
-            varHtml = `<div class="res-row"><span class="lbl">Precio unidad antes</span><span class="val">$${s.unidad_antes.toFixed(2)}</span></div>
-                <div class="res-row"><span class="lbl">Precio unidad después</span><span class="val">$${s.unidad_despues.toFixed(2)}</span></div>
+            varHtml = `<div class="res-row"><span class="lbl">Unidad Antes</span><span class="val">$${s.unidad_antes.toFixed(2)}</span></div>
+                <div class="res-row"><span class="lbl">Unidad Después</span><span class="val">$${s.unidad_despues.toFixed(2)}</span></div>
                 <div class="res-row" style="border-top:1px dashed #ddd6fe;padding-top:4px;"><span class="lbl font-semibold">Variación unidad</span><span class="val font-extrabold" style="color:${color};">${signo}${s.variacion_unidad_pct.toFixed(2)}%</span></div>`;
         }
         bloque.innerHTML = `
@@ -770,22 +753,23 @@ document.getElementById('btnCalcCalc').addEventListener('click', () => {
                 <span class="pill-info">Factura: ${s.factura}</span>
             </div>
             <div style="background:#eff6ff;border-radius:10px;padding:8px 12px;margin-bottom:8px;">
-                <p style="font-size:10px;font-weight:800;color:#0369a1;text-transform:uppercase;margin-bottom:5px;">1️⃣ Precio vendido</p>
-                <div class="res-row"><span class="lbl">Monto factura</span><span class="val">$${s.monto_factura.toFixed(2)}</span></div>
-                ${s.descuento_pct>0?`<div class="res-row"><span class="lbl">Pronto pago ${s.descuento_pct}%</span><span class="val" style="color:#16a34a;">−$${r2(s.monto_factura-s.monto_efectivo).toFixed(2)}</span></div>`:''}
-                <div class="res-row"><span class="lbl">Pacas facturadas</span><span class="val">${s.pacas_factura}${s.pacas_promo>0?` + ${s.pacas_promo} promo`:''}</span></div>
-                <div class="res-row" style="border-top:1px dashed #bae6fd;padding-top:5px;margin-top:3px;"><span class="lbl font-semibold">Precio real / paca</span><span class="val font-extrabold" style="color:#0369a1;">$${s.precio_real_paca.toFixed(2)}</span></div>
+                <p style="font-size:10px;font-weight:800;color:#0369a1;text-transform:uppercase;margin-bottom:5px;">1️⃣ Viejo</p>
+                <div class="res-row"><span class="lbl">Total</span><span class="val">$${s.p1_total_dol.toFixed(2)}</span></div>
+                <div class="res-row"><span class="lbl">Pacas</span><span class="val">${s.p1_pacas}${s.p1_promo>0?` + ${s.p1_promo} promo`:''}</span></div>
+                <div class="res-row" style="border-top:1px dashed #bae6fd;padding-top:5px;margin-top:3px;"><span class="lbl font-semibold">Precio Final / Paca</span><span class="val font-extrabold" style="color:#0369a1;">$${s.p1_neto.toFixed(2)}</span></div>
             </div>
             <div style="background:#fffbeb;border-radius:10px;padding:8px 12px;margin-bottom:8px;">
-                <p style="font-size:10px;font-weight:800;color:#b45309;text-transform:uppercase;margin-bottom:5px;">2️⃣ Precio nuevo</p>
-                <div class="res-row"><span class="lbl">Precio nuevo bruto</span><span class="val">$${s.precio_nuevo_bruto.toFixed(2)}</span></div>
-                <div class="res-row"><span class="lbl font-semibold">Precio nuevo neto</span><span class="val font-extrabold" style="color:#16a34a;">$${s.precio_nuevo_neto.toFixed(2)}</span></div>
-                <div class="res-row"><span class="lbl">Pacas a reconocer</span><span class="val">${s.pacas_a_reconocer}</span></div>
+                <p style="font-size:10px;font-weight:800;color:#b45309;text-transform:uppercase;margin-bottom:5px;">2️⃣ Nuevo</p>
+                <div class="res-row"><span class="lbl">Total</span><span class="val">$${s.p2_total_dol.toFixed(2)}</span></div>
+                <div class="res-row"><span class="lbl">Pacas</span><span class="val">${s.p2_pacas}${s.p2_promo>0?` + ${s.p2_promo} promo`:''}</span></div>
+                <div class="res-row" style="border-top:1px dashed #fde68a;padding-top:5px;margin-top:3px;"><span class="lbl font-semibold">Precio Final / Paca</span><span class="val font-extrabold" style="color:#b45309;">$${s.p2_neto.toFixed(2)}</span></div>
             </div>
-            ${varHtml?`<div style="background:#f5f3ff;border-radius:10px;padding:8px 12px;margin-bottom:8px;"><p style="font-size:10px;font-weight:800;color:#6d28d9;text-transform:uppercase;margin-bottom:5px;">3️⃣ Precio unidad (ref.)</p>${varHtml}</div>`:''}
-            <div class="res-row" style="border-top:1.5px solid #fde68a;padding-top:8px;"><span class="lbl font-semibold">Diferencia / paca</span><span class="val" style="color:#d97706;">$${s.diferencia_paca.toFixed(2)}</span></div>
-            <div class="res-row"><span class="lbl">Total a compensar</span><span class="val" style="color:#b45309;">$${s.total_compensar.toFixed(2)}</span></div>
-            <div class="res-row highlight"><span class="lbl">Pacas a entregar ↓</span><span class="val">${s.pacas_a_entregar} paca${s.pacas_a_entregar!==1?'s':''}</span></div>
+            ${varHtml?`<div style="background:#f5f3ff;border-radius:10px;padding:8px 12px;margin-bottom:8px;"><p style="font-size:10px;font-weight:800;color:#6d28d9;text-transform:uppercase;margin-bottom:5px;">3️⃣ Unidad (${s.unidades_por_paca})</p>${varHtml}</div>`:''}
+            
+            <div class="res-row" style="border-top:1.5px solid #e5e7eb;padding-top:8px;"><span class="lbl font-semibold">Pacas a reconocer</span><span class="val">${s.pacas_a_reconocer}</span></div>
+            <div class="res-row"><span class="lbl font-semibold">Diferencia / paca</span><span class="val" style="color:#d97706;">$${s.diferencia_paca.toFixed(2)}</span></div>
+            <div class="res-row"><span class="lbl">Total a compensar</span><span class="val" style="color:#b45309; font-size:15px;">$${s.total_compensar.toFixed(2)}</span></div>
+            <div class="res-row highlight"><span class="lbl">Pacas a entregar ↓</span><span class="val text-green-600">${s.pacas_a_entregar} paca${s.pacas_a_entregar!==1?'s':''}</span></div>
             ${s.fotos.length>0?`<p style="font-size:11px;color:#6b7280;margin-top:6px;">📷 ${s.fotos.length} foto${s.fotos.length!==1?'s':''} de inventario</p>`:''}
         `;
         resDiv.appendChild(bloque);
@@ -849,13 +833,18 @@ document.getElementById('btnGuardarComp').addEventListener('click', async () => 
                 urlsFotos.push(publicUrl);
             }
             filas.push({
-                promotor_nombre:ultimoResultado.promotor_nombre, cliente_nombre:ultimoResultado.cliente_nombre,
-                observaciones:ultimoResultado.observaciones, producto:s.producto, numero_factura:s.factura,
-                monto_factura:s.monto_factura, descuento_pct:s.descuento_pct, monto_efectivo:s.monto_efectivo,
-                pacas_factura:s.pacas_factura, pacas_promo:s.pacas_promo, pacas_totales:s.pacas_totales,
-                precio_real_paca:s.precio_real_paca, precio_nuevo_bruto:s.precio_nuevo_bruto, precio_nuevo_neto:s.precio_nuevo_neto,
+                promotor_nombre:ultimoResultado.promotor_nombre, 
+                cliente_nombre:ultimoResultado.cliente_nombre,
+                observaciones:ultimoResultado.observaciones, 
+                producto:s.producto, 
+                numero_factura:s.factura,
+                
+                // NOTA: Asegúrate de que las columnas en tu base de datos reflejen estas llaves actualizadas
+                p1_pacas: s.p1_pacas, p1_precio: s.p1_precio, p1_promo: s.p1_promo, p1_neto: s.p1_neto,
+                p2_pacas: s.p2_pacas, p2_precio: s.p2_precio, p2_promo: s.p2_promo, p2_neto: s.p2_neto,
+                
                 pacas_a_reconocer:s.pacas_a_reconocer,
-                unidad_antes:s.unidad_antes||null, unidad_despues:s.unidad_despues||null, variacion_unidad_pct:s.variacion_unidad_pct,
+                unidades_por_paca:s.unidades_por_paca, unidad_antes:s.unidad_antes, unidad_despues:s.unidad_despues, variacion_unidad_pct:s.variacion_unidad_pct,
                 diferencia_paca:s.diferencia_paca, total_compensar:s.total_compensar, pacas_a_entregar:s.pacas_a_entregar,
                 tipo_cierre:tipoCierre.toUpperCase(), precio_fijo_cliente:tipoCierre==='precio'?preciosFijos[i]:null,
                 fotos_inventario:urlsFotos
