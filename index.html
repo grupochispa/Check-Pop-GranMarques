@@ -21,19 +21,20 @@
         }
     </script>
     <style>
-        /* Marca de agua SVG pura (No depende de imágenes externas) */
+        /* Marca de agua SVG pura */
         body::before {
-            content: '';
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 150'%3E%3Cpath d='M 20 140 V 60 A 40 40 0 0 1 100 60 V 140 Z' fill='none' stroke='%23c19b6c' stroke-width='4'/%3E%3Cpath d='M 10 140 H 110' stroke='%23c19b6c' stroke-width='4'/%3E%3Cpolygon points='60,18 63,25 70,28 63,31 60,38 57,31 50,28 57,25' fill='%23c19b6c'/%3E%3Crect x='35' y='45' width='8' height='60' fill='%23c19b6c'/%3E%3Crect x='25' y='105' width='28' height='6' fill='%23c19b6c' rx='2'/%3E%3Crect x='35' y='111' width='8' height='15' fill='%23c19b6c'/%3E%3Crect x='31' y='126' width='16' height='4' fill='%23c19b6c' rx='2'/%3E%3Cpath d='M 55 55 C 75 50 85 60 85 80 C 80 90 70 95 65 95 L 60 85 L 50 80 Z' fill='none' stroke='%23c19b6c' stroke-width='4'/%3E%3Cline x1='53' y1='65' x2='68' y2='65' stroke='%23c19b6c' stroke-width='3'/%3E%3Cline x1='51' y1='73' x2='65' y2='73' stroke='%23c19b6c' stroke-width='3'/%3E%3Cpath d='M 85 80 V 140' fill='none' stroke='%23c19b6c' stroke-width='4'/%3E%3Cpath d='M 65 95 C 75 100 80 110 80 140' fill='none' stroke='%23c19b6c' stroke-width='3'/%3E%3Cpath d='M 43 115 H 55 C 65 115 70 125 70 140' fill='none' stroke='%23c19b6c' stroke-width='4'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: center 30%;
-            background-size: 60%;
-            opacity: 0.05; 
-            z-index: -1;
-            pointer-events: none;
+            background-repeat: no-repeat; background-position: center 30%; background-size: 60%;
+            opacity: 0.05; z-index: -1; pointer-events: none;
         }
+
+        .tab-btn {
+            padding: 12px 0; font-size: 13px; font-weight: 700; color: #6b7280;
+            border-bottom: 3px solid transparent; transition: all 0.2s; cursor: pointer;
+            text-align: center; width: 33.33%;
+        }
+        .tab-btn.activo { color: #0284c7; border-bottom-color: #0284c7; }
 
         .pop-chip input[type="checkbox"] { display:none; }
         .pop-chip label { display:inline-flex; align-items:center; cursor:pointer; transition:all 0.2s ease; }
@@ -41,7 +42,6 @@
 
         #loadingModal { display:none; align-items:center; justify-content:center; }
         #loadingModal.activo { display:flex; }
-
         #calcModal { display:none; align-items:flex-end; justify-content:center; }
         #calcModal.activo { display:flex; }
         #calcModalPanel { transform:translateY(100%); transition:transform 0.35s cubic-bezier(0.32,0.72,0,1); }
@@ -63,41 +63,30 @@
 
         .sku-card {
             background:#fffbeb; border:1.5px solid #fde68a;
-            border-radius:16px; padding:16px 16px 16px 16px;
-            position:relative; transition: border-color 0.2s;
+            border-radius:16px; padding:16px; position:relative; transition: border-color 0.2s;
             box-shadow: 0 4px 6px -1px rgba(253, 230, 138, 0.5);
         }
         .sku-card + .sku-card { margin-top:12px; }
         .sku-tag {
-            display:inline-flex; align-items:center; gap:6px;
-            font-size:11px; font-weight:800; color:#b45309;
-            text-transform:uppercase; letter-spacing:0.06em;
-            margin-bottom:12px;
+            display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:800; color:#b45309;
+            text-transform:uppercase; letter-spacing:0.06em; margin-bottom:12px;
         }
         .sku-remove {
-            position:absolute; top:12px; right:12px;
-            width:26px; height:26px; background:#fee2e2;
-            border-radius:50%; display:flex; align-items:center;
-            justify-content:center; border:none; cursor:pointer;
-            color:#ef4444; transition:background 0.15s;
+            position:absolute; top:12px; right:12px; width:26px; height:26px; background:#fee2e2;
+            border-radius:50%; display:flex; align-items:center; justify-content:center;
+            border:none; cursor:pointer; color:#ef4444; transition:background 0.15s;
         }
         .sku-remove:hover { background:#fecaca; }
 
-        .res-sku-block {
-            border-left:3px solid #f59e0b;
-            padding-left:12px; margin-bottom:14px;
-        }
+        .res-sku-block { border-left:3px solid #f59e0b; padding-left:12px; margin-bottom:14px; }
         .res-sku-block:last-child { margin-bottom:0; }
 
         .cierre-btn {
             flex:1; padding:10px 6px; font-size:12px; font-weight:700;
-            border:2px solid #e5e7eb; border-radius:12px;
-            background:white; cursor:pointer; transition:all 0.2s;
-            text-align:center; color:#6b7280; min-width:96px;
+            border:2px solid #e5e7eb; border-radius:12px; background:white;
+            cursor:pointer; transition:all 0.2s; text-align:center; color:#6b7280; min-width:96px;
         }
-        .cierre-btn.activo {
-            border-color:#0284c7; background:#eff6ff; color:#0369a1;
-        }
+        .cierre-btn.activo { border-color:#0284c7; background:#eff6ff; color:#0369a1; }
 
         .field-label { display:block; font-size:12px; font-weight:600; color:#374151; margin-bottom:4px; }
         .field-sub   { font-size:11px; font-weight:400; color:#9ca3af; }
@@ -105,33 +94,16 @@
         .input-base {
             width:100%; padding:10px 12px; border:1.5px solid #fde68a;
             border-radius:12px; font-size:14px; background:white;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            outline:none;
+            transition: border-color 0.2s, box-shadow 0.2s; outline:none;
         }
         .input-base:focus { border-color:#f59e0b; box-shadow:0 0 0 3px rgba(245,158,11,0.15); }
-        .input-base.readonly-field {
-            background-color: #f3f4f6;
-            color: #6b7280;
-            cursor: not-allowed;
-            border-style: dashed;
-        }
+        .input-base.readonly-field { background-color: #f3f4f6; color: #6b7280; cursor: not-allowed; border-style: dashed; }
 
         .input-prefix { position:relative; }
-        .input-prefix span {
-            position:absolute; left:12px; top:50%; transform:translateY(-50%);
-            font-size:13px; font-weight:600; color:#9ca3af; pointer-events:none;
-        }
+        .input-prefix span { position:absolute; left:12px; top:50%; transform:translateY(-50%); font-size:13px; font-weight:600; color:#9ca3af; pointer-events:none; }
         .input-prefix input { padding-left:22px; }
 
         .grid2 { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-        .grid3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
-
-        .pill-info {
-            display:inline-flex; align-items:center; gap:4px;
-            background:#fef3c7; color:#92400e; border-radius:999px;
-            padding:3px 10px; font-size:11px; font-weight:700;
-        }
-
         .res-row { display:flex; justify-content:space-between; align-items:center; padding:4px 0; font-size:13px; }
         .res-row .lbl { color:#6b7280; }
         .res-row .val { font-weight:700; color:#111827; }
@@ -139,144 +111,204 @@
         .res-row.highlight .lbl { font-weight:600; color:#374151; }
         .res-row.highlight .val { font-size:18px; font-weight:800; color:#b45309; }
 
-        .badge-pedido {
-            background:#eff6ff; border:1px solid #bfdbfe;
-            border-radius:10px; padding:8px 12px; margin-top:6px; font-size:12px;
-        }
-        .badge-credito {
-            background:#f0fdf4; border:1px solid #bbf7d0;
-            border-radius:10px; padding:8px 12px; margin-top:6px; font-size:12px;
-        }
-
         select.input-base { appearance:none; -webkit-appearance:none; padding-right:32px; }
         .select-wrap { position:relative; }
         .select-wrap::after {
-            content:''; position:absolute; right:12px; top:50%;
-            transform:translateY(-50%);
-            border-left:5px solid transparent; border-right:5px solid transparent;
-            border-top:6px solid #9ca3af; pointer-events:none;
+            content:''; position:absolute; right:12px; top:50%; transform:translateY(-50%);
+            border-left:5px solid transparent; border-right:5px solid transparent; border-top:6px solid #9ca3af; pointer-events:none;
         }
+
+        /* Estilos para cards de Galeria */
+        .gal-card { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(8px); border-radius: 16px; border: 1px solid #e5e7eb; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 16px; }
+        .gal-img-scroll { display: flex; overflow-x: auto; gap: 8px; padding: 12px; scroll-snap-type: x mandatory; }
+        .gal-img-scroll img { scroll-snap-align: start; width: 140px; height: 140px; object-fit: cover; border-radius: 12px; border: 1px solid #f3f4f6; }
+        .gal-img-scroll::-webkit-scrollbar { height: 6px; }
+        .gal-img-scroll::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Estilos KPIs */
+        .kpi-card { background: white; border-radius: 16px; padding: 16px; border: 1px solid #e5e7eb; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .kpi-value { font-size: 28px; font-weight: 800; color: #0c4a6e; line-height: 1.2; }
+        .kpi-label { font-size: 12px; font-weight: 600; color: #6b7280; text-transform: uppercase; letter-spacing: 0.05em; }
     </style>
 </head>
 <body class="bg-brand-50 text-brand-900 font-sans antialiased min-h-screen pb-24 relative z-0">
 
 <header class="bg-[#1a2b56] shadow-md sticky top-0 z-40">
-    <nav class="max-w-lg mx-auto px-4 py-3 flex items-center gap-3">
-        <div class="w-8 h-10 flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 150" width="100%" height="100%">
-                <path d="M 20 140 V 60 A 40 40 0 0 1 100 60 V 140 Z" fill="none" stroke="#c19b6c" stroke-width="4"/>
-                <path d="M 10 140 H 110" stroke="#c19b6c" stroke-width="4"/>
-                <polygon points="60,18 63,25 70,28 63,31 60,38 57,31 50,28 57,25" fill="#c19b6c"/>
-                <rect x="35" y="45" width="8" height="60" fill="#c19b6c"/>
-                <rect x="25" y="105" width="28" height="6" fill="#c19b6c" rx="2"/>
-                <rect x="35" y="111" width="8" height="15" fill="#c19b6c"/>
-                <rect x="31" y="126" width="16" height="4" fill="#c19b6c" rx="2"/>
-                <path d="M 55 55 C 75 50 85 60 85 80 C 80 90 70 95 65 95 L 60 85 L 50 80 Z" fill="none" stroke="#c19b6c" stroke-width="4"/>
-                <line x1="53" y1="65" x2="68" y2="65" stroke="#c19b6c" stroke-width="3"/>
-                <line x1="51" y1="73" x2="65" y2="73" stroke="#c19b6c" stroke-width="3"/>
-                <path d="M 85 80 V 140" fill="none" stroke="#c19b6c" stroke-width="4"/>
-                <path d="M 65 95 C 75 100 80 110 80 140" fill="none" stroke="#c19b6c" stroke-width="3"/>
-                <path d="M 43 115 H 55 C 65 115 70 125 70 140" fill="none" stroke="#c19b6c" stroke-width="4"/>
-            </svg>
-        </div>
-        <div class="flex flex-col">
-            <span class="text-xl font-extrabold tracking-tight text-white leading-none">Marques<span class="text-amber-400">Check</span></span>
-            <span class="text-[10px] font-bold text-blue-200 uppercase tracking-widest mt-0.5">CHISPA C.A.</span>
+    <nav class="max-w-lg mx-auto px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-10 flex-shrink-0">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 150" width="100%" height="100%">
+                    <path d="M 20 140 V 60 A 40 40 0 0 1 100 60 V 140 Z" fill="none" stroke="#c19b6c" stroke-width="4"/>
+                    <path d="M 10 140 H 110" stroke="#c19b6c" stroke-width="4"/>
+                    <polygon points="60,18 63,25 70,28 63,31 60,38 57,31 50,28 57,25" fill="#c19b6c"/>
+                    <rect x="35" y="45" width="8" height="60" fill="#c19b6c"/>
+                    <rect x="25" y="105" width="28" height="6" fill="#c19b6c" rx="2"/>
+                    <rect x="35" y="111" width="8" height="15" fill="#c19b6c"/>
+                    <rect x="31" y="126" width="16" height="4" fill="#c19b6c" rx="2"/>
+                    <path d="M 55 55 C 75 50 85 60 85 80 C 80 90 70 95 65 95 L 60 85 L 50 80 Z" fill="none" stroke="#c19b6c" stroke-width="4"/>
+                    <line x1="53" y1="65" x2="68" y2="65" stroke="#c19b6c" stroke-width="3"/>
+                    <line x1="51" y1="73" x2="65" y2="73" stroke="#c19b6c" stroke-width="3"/>
+                    <path d="M 85 80 V 140" fill="none" stroke="#c19b6c" stroke-width="4"/>
+                    <path d="M 65 95 C 75 100 80 110 80 140" fill="none" stroke="#c19b6c" stroke-width="3"/>
+                    <path d="M 43 115 H 55 C 65 115 70 125 70 140" fill="none" stroke="#c19b6c" stroke-width="4"/>
+                </svg>
+            </div>
+            <div class="flex flex-col">
+                <span class="text-xl font-extrabold tracking-tight text-white leading-none">Marques<span class="text-amber-400">Check</span></span>
+                <span class="text-[10px] font-bold text-blue-200 uppercase tracking-widest mt-0.5">CHISPA C.A.</span>
+            </div>
         </div>
     </nav>
+    <div class="flex max-w-lg mx-auto bg-white border-b border-gray-200 shadow-sm">
+        <button class="tab-btn activo" data-target="view-registro">Registro</button>
+        <button class="tab-btn" data-target="view-galeria">Galería Hoy</button>
+        <button class="tab-btn" data-target="view-kpis">Estadísticas</button>
+    </div>
 </header>
 
 <main class="max-w-lg mx-auto p-4">
-    <div class="mb-6">
-        <h1 class="text-2xl font-extrabold tracking-tight">Registro de Visita</h1>
-        <p class="text-gray-600 text-sm mt-1">Complete los detalles y adjunte evidencias.</p>
-    </div>
-    <form id="popForm" class="space-y-5">
-        <section class="bg-white/95 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
-            <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider">Datos Generales</h2>
-            <div>
-                <label for="promotor" class="block text-sm font-semibold text-gray-700 mb-1.5">Vendedor</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>
-                    <select id="promotor" name="promotor" required class="w-full pl-11 pr-10 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition appearance-none bg-white text-base">
-                        <option value="" disabled selected>Seleccione un vendedor</option>
-                        <option>ALEIDY COLINA</option><option>DAVID LINARES</option><option>DIONERGI GUERRERO</option>
-                        <option>DIOMIRA ROSALES</option><option>EDWIN BRITO</option><option>GABRIELA PARRA</option>
-                        <option>GILBERT RODRIGUEZ</option><option>JESUS FERREIRA</option><option>JORGE VELASQUEZ</option>
-                        <option>JOSE DEL ROSARIO</option><option>LUIS FLORES</option><option>MARCOS VIDAL</option>
-                        <option>MARIO BIGOTT</option><option>OWER ABREU</option><option>PIERO FIGUEROA</option>
-                        <option>RAFAEL GARCÍA</option><option>SAULO RIVERO</option><option>SURASKY VILLAFAÑA</option>
-                        <option>TORCOROMA VENCE</option><option>VANESSA VARGAS</option><option>WILMER DUQUE</option>
-                        <option>YINIBER PEREIRA</option><option>YORKEN MAESTRE</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
-                </div>
-            </div>
-            <div>
-                <label for="cliente" class="block text-sm font-semibold text-gray-700 mb-1.5">Cliente / Establecimiento</label>
-                <div class="relative">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div>
-                    <input type="text" id="cliente" name="cliente" required placeholder="Nombre del local" class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition text-base">
-                </div>
-            </div>
-            <div>
-                <label for="estado" class="block text-sm font-semibold text-gray-700 mb-1.5">Estado</label>
-                <div class="relative">
-                    <select id="estado" name="estado" required class="w-full pl-4 pr-10 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 appearance-none bg-white text-base">
-                        <option value="" disabled selected>Seleccione un estado</option>
-                        <option>Amazonas</option><option>Anzoátegui</option><option>Apure</option><option>Aragua</option>
-                        <option>Barinas</option><option>Bolívar</option><option>Carabobo</option><option>Cojedes</option>
-                        <option>Delta Amacuro</option><option>Distrito Capital</option><option>Falcón</option>
-                        <option>Guárico</option><option>Lara</option><option value="La Guaira">La Guaira (Vargas)</option>
-                        <option>Mérida</option><option>Miranda</option><option>Monagas</option><option>Nueva Esparta</option>
-                        <option>Portuguesa</option><option>Sucre</option><option>Táchira</option><option>Trujillo</option>
-                        <option>Yaracuy</option><option>Zulia</option>
-                    </select>
-                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
-                </div>
-            </div>
-        </section>
-
-        <section class="bg-white/95 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-gray-100">
-            <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-3">Material POP</h2>
-            <div class="flex flex-wrap gap-2 pop-chip">
-                <div><input type="checkbox" id="mat_cenefa" value="CENEFA" class="mat-check"><label for="mat_cenefa" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium">CENEFA</label></div>
-                <div><input type="checkbox" id="mat_hablador" value="HABLADOR" class="mat-check"><label for="mat_hablador" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium">HABLADOR</label></div>
-                <div><input type="checkbox" id="mat_afiche" value="AFICHE" class="mat-check"><label for="mat_afiche" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium">AFICHE</label></div>
-                <div><input type="checkbox" id="mat_dangler" value="DANGLER" class="mat-check"><label for="mat_dangler" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium">DANGLER</label></div>
-                <div><input type="checkbox" id="mat_rompe" value="ROMPE TRAFICO" class="mat-check"><label for="mat_rompe" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium">ROMPE TRAFICO</label></div>
-            </div>
-        </section>
-
-        <section class="bg-white/95 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-gray-100">
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider">Evidencias Fotográficas</h2>
-                <span id="contador-fotos" class="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">0 fotos</span>
-            </div>
-            <div class="space-y-4">
-                <div id="fotos-grid" class="grid grid-cols-3 gap-3 hidden"></div>
-                <div class="grid grid-cols-2 gap-3">
-                    <button type="button" id="btnCamera" class="flex flex-col items-center justify-center gap-2 py-4 bg-brand-600 hover:bg-brand-700 active:scale-[0.97] text-white rounded-xl font-semibold text-sm transition shadow-md shadow-brand-200">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                        Tomar Foto
-                    </button>
-                    <button type="button" id="btnGallery" class="flex flex-col items-center justify-center gap-2 py-4 border-2 border-gray-200 hover:border-brand-400 hover:bg-brand-50 active:scale-[0.97] text-gray-600 rounded-xl font-semibold text-sm transition">
-                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
-                        Galería
-                    </button>
-                </div>
-                <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
-                <input type="file" id="galleryInput" accept="image/*" multiple class="hidden">
-            </div>
-        </section>
-
-        <div class="pt-2 sticky bottom-4 z-30">
-            <button type="submit" id="btnSubmit" class="w-full flex items-center justify-center gap-3 bg-brand-600 hover:bg-brand-700 active:scale-[0.98] disabled:opacity-60 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-brand-200 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                Guardar Registro
-            </button>
+    
+    <div id="view-registro" class="view-section">
+        <div class="mb-6">
+            <h1 class="text-2xl font-extrabold tracking-tight">Registro de Visita</h1>
+            <p class="text-gray-600 text-sm mt-1">Complete los detalles y adjunte evidencias.</p>
         </div>
-    </form>
+        <form id="popForm" class="space-y-5">
+            <section class="bg-white/95 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-gray-100 space-y-4">
+                <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider">Datos Generales</h2>
+                <div>
+                    <label for="promotor" class="block text-sm font-semibold text-gray-700 mb-1.5">Vendedor</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg></div>
+                        <select id="promotor" name="promotor" required class="w-full pl-11 pr-10 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition appearance-none bg-white text-base">
+                            <option value="" disabled selected>Seleccione un vendedor</option>
+                            <option>ALEIDY COLINA</option><option>DAVID LINARES</option><option>DIONERGI GUERRERO</option>
+                            <option>DIOMIRA ROSALES</option><option>EDWIN BRITO</option><option>GABRIELA PARRA</option>
+                            <option>GILBERT RODRIGUEZ</option><option>JESUS FERREIRA</option><option>JORGE VELASQUEZ</option>
+                            <option>JOSE DEL ROSARIO</option><option>LUIS FLORES</option><option>MARCOS VIDAL</option>
+                            <option>MARIO BIGOTT</option><option>OWER ABREU</option><option>PIERO FIGUEROA</option>
+                            <option>RAFAEL GARCÍA</option><option>SAULO RIVERO</option><option>SURASKY VILLAFAÑA</option>
+                            <option>TORCOROMA VENCE</option><option>VANESSA VARGAS</option><option>WILMER DUQUE</option>
+                            <option>YINIBER PEREIRA</option><option>YORKEN MAESTRE</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+                    </div>
+                </div>
+                <div>
+                    <label for="cliente" class="block text-sm font-semibold text-gray-700 mb-1.5">Cliente / Establecimiento</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-400"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg></div>
+                        <input type="text" id="cliente" name="cliente" required placeholder="Nombre del local" class="w-full pl-11 pr-4 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 transition text-base">
+                    </div>
+                </div>
+                <div>
+                    <label for="estado" class="block text-sm font-semibold text-gray-700 mb-1.5">Estado</label>
+                    <div class="relative">
+                        <select id="estado" name="estado" required class="w-full pl-4 pr-10 py-3.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-brand-100 focus:border-brand-600 appearance-none bg-white text-base">
+                            <option value="" disabled selected>Seleccione un estado</option>
+                            <option>Amazonas</option><option>Anzoátegui</option><option>Apure</option><option>Aragua</option>
+                            <option>Barinas</option><option>Bolívar</option><option>Carabobo</option><option>Cojedes</option>
+                            <option>Delta Amacuro</option><option>Distrito Capital</option><option>Falcón</option>
+                            <option>Guárico</option><option>Lara</option><option value="La Guaira">La Guaira (Vargas)</option>
+                            <option>Mérida</option><option>Miranda</option><option>Monagas</option><option>Nueva Esparta</option>
+                            <option>Portuguesa</option><option>Sucre</option><option>Táchira</option><option>Trujillo</option>
+                            <option>Yaracuy</option><option>Zulia</option>
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="bg-white/95 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-gray-100">
+                <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider mb-3">Material POP</h2>
+                <div class="flex flex-wrap gap-2 pop-chip">
+                    <div><input type="checkbox" id="mat_cenefa" value="CENEFA" class="mat-check"><label for="mat_cenefa" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium">CENEFA</label></div>
+                    <div><input type="checkbox" id="mat_hablador" value="HABLADOR" class="mat-check"><label for="mat_hablador" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium">HABLADOR</label></div>
+                    <div><input type="checkbox" id="mat_afiche" value="AFICHE" class="mat-check"><label for="mat_afiche" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium">AFICHE</label></div>
+                    <div><input type="checkbox" id="mat_dangler" value="DANGLER" class="mat-check"><label for="mat_dangler" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium">DANGLER</label></div>
+                    <div><input type="checkbox" id="mat_rompe" value="ROMPE TRAFICO" class="mat-check"><label for="mat_rompe" class="px-4 py-2 border border-gray-200 rounded-full text-sm font-medium">ROMPE TRAFICO</label></div>
+                </div>
+            </section>
+
+            <section class="bg-white/95 backdrop-blur-sm p-5 rounded-2xl shadow-sm border border-gray-100">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-xs font-bold text-brand-700 uppercase tracking-wider">Evidencias Fotográficas</h2>
+                    <span id="contador-fotos" class="text-xs font-semibold text-gray-500 bg-gray-100 px-2 py-1 rounded-md">0 fotos</span>
+                </div>
+                <div class="space-y-4">
+                    <div id="fotos-grid" class="grid grid-cols-3 gap-3 hidden"></div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <button type="button" id="btnCamera" class="flex flex-col items-center justify-center gap-2 py-4 bg-brand-600 hover:bg-brand-700 active:scale-[0.97] text-white rounded-xl font-semibold text-sm transition shadow-md shadow-brand-200">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                            Tomar Foto
+                        </button>
+                        <button type="button" id="btnGallery" class="flex flex-col items-center justify-center gap-2 py-4 border-2 border-gray-200 hover:border-brand-400 hover:bg-brand-50 active:scale-[0.97] text-gray-600 rounded-xl font-semibold text-sm transition">
+                            <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                            Galería
+                        </button>
+                    </div>
+                    <input type="file" id="cameraInput" accept="image/*" capture="environment" class="hidden">
+                    <input type="file" id="galleryInput" accept="image/*" multiple class="hidden">
+                </div>
+            </section>
+
+            <div class="pt-2 sticky bottom-4 z-30">
+                <button type="submit" id="btnSubmit" class="w-full flex items-center justify-center gap-3 bg-brand-600 hover:bg-brand-700 active:scale-[0.98] disabled:opacity-60 text-white py-4 rounded-xl font-bold text-lg shadow-xl shadow-brand-200 transition">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                    Guardar Registro
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div id="view-galeria" class="view-section hidden">
+        <div class="mb-4 flex items-center justify-between">
+            <h1 class="text-xl font-extrabold tracking-tight">Actividad de Hoy</h1>
+            <span id="galeria-total" class="text-xs font-semibold bg-brand-100 text-brand-700 px-2 py-1 rounded-full">0 registros</span>
+        </div>
+        
+        <div id="galeria-container" class="space-y-4">
+            </div>
+
+        <button id="btnCargarMas" class="hidden w-full mt-4 py-3 bg-white border border-gray-200 text-brand-600 font-semibold rounded-xl hover:bg-brand-50 transition">
+            Cargar más registros
+        </button>
+        
+        <div id="galeria-vacia" class="hidden text-center py-10">
+            <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+            <p class="text-gray-500 font-medium">Aún no hay visitas registradas hoy.</p>
+        </div>
+    </div>
+
+    <div id="view-kpis" class="view-section hidden space-y-4">
+        <div class="mb-2">
+            <h1 class="text-xl font-extrabold tracking-tight">Métricas Generales</h1>
+            <p class="text-gray-500 text-xs">Información consolidada de los registros.</p>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+            <div class="kpi-card">
+                <p class="kpi-label">Visitas Totales</p>
+                <p id="kpi-visitas" class="kpi-value mt-1">...</p>
+            </div>
+            <div class="kpi-card border-brand-200 bg-brand-50">
+                <p class="kpi-label text-brand-600">Material POP Entregado</p>
+                <p id="kpi-pop" class="kpi-value mt-1 text-brand-700">...</p>
+            </div>
+            <div class="kpi-card border-green-200 bg-green-50 col-span-2">
+                <p class="kpi-label text-green-700">Total Compensado ($)</p>
+                <p id="kpi-compensado" class="kpi-value mt-1 text-green-800 text-4xl">...</p>
+            </div>
+        </div>
+
+        <div class="kpi-card mt-2">
+            <p class="kpi-label mb-3 border-b border-gray-100 pb-2">Top Promotores (Visitas)</p>
+            <div id="kpi-promotores" class="space-y-3">
+                <div class="text-sm text-gray-500 text-center py-2">Calculando...</div>
+            </div>
+        </div>
+    </div>
+
 </main>
 
 <button id="fabCalc" title="Calculadora de Compensación">
@@ -439,6 +471,23 @@
 </div>
 
 <script>
+// ─── Lógica de Pestañas (Tabs) ────────────────────────────────
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        // Quitar activo a todos
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('activo'));
+        document.querySelectorAll('.view-section').forEach(v => v.classList.add('hidden'));
+        
+        // Poner activo al clickeado
+        btn.classList.add('activo');
+        document.getElementById(btn.dataset.target).classList.remove('hidden');
+
+        // Disparar carga de datos si aplica
+        if(btn.dataset.target === 'view-galeria') cargarGaleria(true);
+        if(btn.dataset.target === 'view-kpis') cargarKPIs();
+    });
+});
+
 // ─── Generación NATIVA del Logo para PDF (Sin archivos externos) ──
 let logoPngBase64 = null;
 const svgStr = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 150" width="240" height="300"><path d="M 20 140 V 60 A 40 40 0 0 1 100 60 V 140 Z" fill="none" stroke="#c19b6c" stroke-width="4"/><path d="M 10 140 H 110" stroke="#c19b6c" stroke-width="4"/><polygon points="60,18 63,25 70,28 63,31 60,38 57,31 50,28 57,25" fill="#c19b6c"/><rect x="35" y="45" width="8" height="60" fill="#c19b6c"/><rect x="25" y="105" width="28" height="6" fill="#c19b6c" rx="2"/><rect x="35" y="111" width="8" height="15" fill="#c19b6c"/><rect x="31" y="126" width="16" height="4" fill="#c19b6c" rx="2"/><path d="M 55 55 C 75 50 85 60 85 80 C 80 90 70 95 65 95 L 60 85 L 50 80 Z" fill="none" stroke="#c19b6c" stroke-width="4"/><line x1="53" y1="65" x2="68" y2="65" stroke="#c19b6c" stroke-width="3"/><line x1="51" y1="73" x2="65" y2="73" stroke="#c19b6c" stroke-width="3"/><path d="M 85 80 V 140" fill="none" stroke="#c19b6c" stroke-width="4"/><path d="M 65 95 C 75 100 80 110 80 140" fill="none" stroke="#c19b6c" stroke-width="3"/><path d="M 43 115 H 55 C 65 115 70 125 70 140" fill="none" stroke="#c19b6c" stroke-width="4"/></svg>`;
@@ -650,20 +699,16 @@ function addSkuCard(scroll=false) {
     const inpUnidades = $('.sku-unidades-paca');
 
     function computar() {
-        // P1 variables
         const p1Pacas  = parseInt(inpP1Pacas.value)  || 0;
         const p1Precio = parseFloat(inpP1Precio.value)|| 0;
         const p1Promo  = parseInt(inpP1Promo.value)  || 0;
-
         const p1TotalDol = r2(p1Pacas * p1Precio);
         const p1TotalPac = p1Pacas + p1Promo;
         const p1Neto     = p1TotalPac > 0 ? r2(p1TotalDol / p1TotalPac) : 0;
 
-        // P2 variables
         const p2Pacas  = parseInt(inpP2Pacas.value)  || 0;
         const p2Precio = parseFloat(inpP2Precio.value)|| 0;
         const p2Promo  = parseInt(inpP2Promo.value)  || 0;
-
         const p2TotalDol = r2(p2Pacas * p2Precio);
         const p2TotalPac = p2Pacas + p2Promo;
         const p2Neto     = p2TotalPac > 0 ? r2(p2TotalDol / p2TotalPac) : 0;
@@ -671,12 +716,10 @@ function addSkuCard(scroll=false) {
         const pacasRecon = parseInt(inpRecon.value) || 0;
         const unidades   = parseInt(inpUnidades.value) || UNIDADES_DEFECTO;
 
-        // Cálculos
         const difPaca   = r2(p1Neto - p2Neto);
         const totalComp = r2(difPaca * pacasRecon);
         const pacasEnt  = (difPaca > 0 && p2Neto > 0) ? Math.floor(totalComp / p2Neto) : 0;
 
-        // Unidades
         const uAntes   = p1Neto > 0 ? r2(p1Neto / unidades) : 0;
         const uDespues = p2Neto > 0 ? r2(p2Neto / unidades) : 0;
         const variacion= (uAntes > 0 && uDespues > 0) ? r2(((uDespues - uAntes)/uAntes)*100) : null;
@@ -684,15 +727,13 @@ function addSkuCard(scroll=false) {
         return {
             p1Pacas, p1Precio, p1Promo, p1TotalDol, p1TotalPac, p1Neto,
             p2Pacas, p2Precio, p2Promo, p2TotalDol, p2TotalPac, p2Neto,
-            pacasRecon, unidades, difPaca, totalComp, pacasEnt,
-            uAntes, uDespues, variacion
+            pacasRecon, unidades, difPaca, totalComp, pacasEnt, uAntes, uDespues, variacion
         };
     }
 
     function actualizar() {
         const c = computar();
 
-        // Step 1 UI
         const p1Wrap = $('.sku-p1-res-wrap');
         if (c.p1TotalPac > 0 && c.p1TotalDol > 0) {
             $('.sku-p1-subtotal').textContent = `$${c.p1TotalDol.toFixed(2)}`;
@@ -700,7 +741,6 @@ function addSkuCard(scroll=false) {
             p1Wrap.classList.remove('hidden');
         } else { p1Wrap.classList.add('hidden'); }
 
-        // Step 2 UI
         const p2Wrap = $('.sku-p2-res-wrap');
         if (c.p2TotalPac > 0 && c.p2TotalDol > 0) {
             $('.sku-p2-subtotal').textContent = `$${c.p2TotalDol.toFixed(2)}`;
@@ -708,28 +748,22 @@ function addSkuCard(scroll=false) {
             p2Wrap.classList.remove('hidden');
         } else { p2Wrap.classList.add('hidden'); }
 
-        // Step 3 Units UI
         const uWrap = $('.sku-unidades-wrap');
         if (c.uAntes > 0 || c.uDespues > 0) {
             $('.sku-u-antes').textContent = `$${c.uAntes.toFixed(2)}`;
             $('.sku-u-despues').textContent = `$${c.uDespues.toFixed(2)}`;
-
             if (c.variacion !== null) {
                 const signo = c.variacion >= 0 ? '+' : '';
                 $('.sku-u-var').textContent = `${signo}${c.variacion.toFixed(2)}%`;
                 $('.sku-u-var').style.color = c.variacion >= 0 ? '#16a34a' : '#dc2626';
-            } else {
-                $('.sku-u-var').textContent = '—';
-            }
+            } else { $('.sku-u-var').textContent = '—'; }
             uWrap.classList.remove('hidden');
         } else { uWrap.classList.add('hidden'); }
 
-        // Resultado Final
         const resBloque = $('.sku-resultado');
         if (c.p1Neto > 0 && c.p2Neto > 0 && c.pacasRecon > 0) {
             resBloque.classList.remove('hidden');
             $('.sku-r-recon').textContent = `${c.pacasRecon} pacas`;
-
             if (c.difPaca > 0) {
                 $('.sku-r-dif').textContent     = `$${c.difPaca.toFixed(2)}`;
                 $('.sku-r-dif').style.color     = '#d97706';
@@ -746,26 +780,17 @@ function addSkuCard(scroll=false) {
         } else { resBloque.classList.add('hidden'); }
     }
 
-    // ── Unidades automáticas al elegir producto ──
     selProducto.addEventListener('change', () => {
         inpUnidades.value = unidadesPorProducto(selProducto.value);
         actualizar();
     });
 
-    // ── Copiar cantidades automáticamente de factura vieja a nueva ──
-    inpP1Pacas.addEventListener('input', () => { 
-        inpP2Pacas.value = inpP1Pacas.value; 
-        actualizar(); 
-    });
-    inpP1Promo.addEventListener('input', () => { 
-        inpP2Promo.value = inpP1Promo.value; 
-        actualizar(); 
-    });
+    inpP1Pacas.addEventListener('input', () => { inpP2Pacas.value = inpP1Pacas.value; actualizar(); });
+    inpP1Promo.addEventListener('input', () => { inpP2Promo.value = inpP1Promo.value; actualizar(); });
 
     [inpP1Pacas, inpP1Precio, inpP1Promo, inpP2Pacas, inpP2Precio, inpP2Promo, inpRecon, inpUnidades]
         .forEach(el => el.addEventListener('input', actualizar));
 
-    // Fotos
     const btnCam=$('.sku-btn-camara'), btnGal=$('.sku-btn-galeria'),
           inpCam=$('.sku-input-camara'), inpGal=$('.sku-input-galeria'),
           fGrid=$('.sku-fotos-grid'), fCount=$('.sku-foto-count');
@@ -785,18 +810,13 @@ function addSkuCard(scroll=false) {
     card._getCalc = () => {
         const c = computar();
         return {
-            producto: $('.sku-producto').value,
-            factura: $('.sku-factura').value.trim(),
-            p1_pacas: c.p1Pacas, p1_precio: c.p1Precio, p1_promo: c.p1Promo,
-            p1_total_dol: c.p1TotalDol, p1_neto: c.p1Neto,
-            p2_pacas: c.p2Pacas, p2_precio: c.p2Precio, p2_promo: c.p2Promo,
-            p2_total_dol: c.p2TotalDol, p2_neto: c.p2Neto,
-            pacas_a_reconocer: c.pacasRecon, unidades_por_paca: c.unidades,
-            unidad_antes: c.uAntes, unidad_despues: c.uDespues, variacion_unidad_pct: c.variacion,
+            producto: $('.sku-producto').value, factura: $('.sku-factura').value.trim(),
+            p1_pacas: c.p1Pacas, p1_precio: c.p1Precio, p1_promo: c.p1Promo, p1_total_dol: c.p1TotalDol, p1_neto: c.p1Neto,
+            p2_pacas: c.p2Pacas, p2_precio: c.p2Precio, p2_promo: c.p2Promo, p2_total_dol: c.p2TotalDol, p2_neto: c.p2Neto,
+            pacas_a_reconocer: c.pacasRecon, unidades_por_paca: c.unidades, unidad_antes: c.uAntes, unidad_despues: c.uDespues, variacion_unidad_pct: c.variacion,
             diferencia_paca: c.difPaca, total_compensar: c.totalComp, pacas_a_entregar: c.pacasEnt
         };
     };
-
     if (scroll) card.scrollIntoView({ behavior:'smooth', block:'nearest' });
 }
 
@@ -832,7 +852,6 @@ document.getElementById('btnCalcCalc').addEventListener('click', () => {
     });
     if (err) return;
 
-    // ── Resumen simplificado ──
     const resDiv = document.getElementById('resDesglose');
     resDiv.innerHTML = '';
     let granTotalCredito = 0;
@@ -855,7 +874,6 @@ document.getElementById('btnCalcCalc').addEventListener('click', () => {
         resDiv.appendChild(bloque);
     });
 
-    // Total general de la nota de crédito
     if (skusData.length > 1) {
         const tot = document.createElement('div');
         tot.style.cssText = 'background:#f0fdf4;border:1.5px solid #bbf7d0;border-radius:12px;padding:10px 14px;margin-top:6px;';
@@ -923,22 +941,16 @@ async function generarComprobante(modo) {
     const W = doc.internal.pageSize.getWidth();
     const H = doc.internal.pageSize.getHeight();
 
-    // Fondo cabecera en azul corporativo
-    doc.setFillColor(26, 43, 86); // #1a2b56
+    doc.setFillColor(26, 43, 86);
     doc.rect(0, 0, W, 100, 'F');
     
-    // Logo en la esquina superior derecha (Desde base64 puro nativo)
-    if (logoPngBase64) {
-        doc.addImage(logoPngBase64, 'PNG', W - 110, 20, 60, 75);
-    }
+    if (logoPngBase64) { doc.addImage(logoPngBase64, 'PNG', W - 110, 20, 60, 75); }
 
     doc.setTextColor(255,255,255);
     doc.setFont('helvetica','bold'); doc.setFontSize(16);
     doc.text('ARROCERA CHISPA C.A.', 40, 42);
-    
     doc.setFontSize(10); doc.setFont('helvetica','normal');
     doc.text('RIF: J-30717543-5', 40, 62);
-    
     doc.setFontSize(9);
     doc.text('Dirección Principal: Carretera vía el Jobal a 2 Km Carretera Nacional', 40, 76);
     doc.text('Turen Píritu GALPON.', 40, 88);
@@ -947,7 +959,6 @@ async function generarComprobante(modo) {
     doc.setTextColor(17,24,39); doc.setFontSize(14);
     doc.setFont('helvetica','bold'); 
     doc.text('COMPROBANTE DE COMPENSACIÓN', 40, y);
-    
     y += 24;
     doc.setFontSize(10);
     const fecha = new Date().toLocaleDateString('es-VE');
@@ -1033,14 +1044,11 @@ document.getElementById('btnGuardarComp').addEventListener('click', async () => 
                 promotor_nombre:ultimoResultado.promotor_nombre,
                 cliente_nombre:ultimoResultado.cliente_nombre,
                 observaciones:ultimoResultado.observaciones,
-                producto:s.producto,
-                numero_factura:s.factura,
-
+                producto:s.producto, numero_factura:s.factura,
                 p1_pacas: s.p1_pacas, p1_precio: s.p1_precio, p1_promo: s.p1_promo, p1_neto: s.p1_neto,
                 p2_pacas: s.p2_pacas, p2_precio: s.p2_precio, p2_promo: s.p2_promo, p2_neto: s.p2_neto,
-
-                pacas_a_reconocer:s.pacas_a_reconocer,
-                unidades_por_paca:s.unidades_por_paca, unidad_antes:s.unidad_antes, unidad_despues:s.unidad_despues, variacion_unidad_pct:s.variacion_unidad_pct,
+                pacas_a_reconocer:s.pacas_a_reconocer, unidades_por_paca:s.unidades_por_paca, 
+                unidad_antes:s.unidad_antes, unidad_despues:s.unidad_despues, variacion_unidad_pct:s.variacion_unidad_pct,
                 diferencia_paca:s.diferencia_paca, total_compensar:s.total_compensar, pacas_a_entregar:s.pacas_a_entregar,
                 tipo_cierre:tipoCierre.toUpperCase(), precio_fijo_cliente:tipoCierre==='precio'?preciosFijos[i]:null,
                 fotos_inventario:urlsFotos
@@ -1055,11 +1063,8 @@ document.getElementById('btnGuardarComp').addEventListener('click', async () => 
 });
 
 function resetCalc() {
-    document.getElementById('calc_promotor').value='';
-    document.getElementById('calc_cliente').value='';
-    document.getElementById('calc_obs').value='';
-    skuContainer.innerHTML=''; skuCount=0; addSkuCard(false);
-    document.getElementById('resultadoComp').classList.add('hidden');
+    document.getElementById('calc_promotor').value=''; document.getElementById('calc_cliente').value=''; document.getElementById('calc_obs').value='';
+    skuContainer.innerHTML=''; skuCount=0; addSkuCard(false); document.getElementById('resultadoComp').classList.add('hidden');
     ultimoResultado=null; tipoCierre=null;
 }
 
@@ -1069,19 +1074,8 @@ function cerrarCalcModal(){calcModal.classList.remove('activo');document.body.st
 document.getElementById('btnCloseCalc').addEventListener('click',cerrarCalcModal);
 calcModal.addEventListener('click',e=>{if(e.target===calcModal)cerrarCalcModal();});
 
-async function cargarClientesPorVendedor(vendedor) {
-    if (!vendedor) return;
-    try {
-        // EJEMPLO — ajustar nombre de tabla y columnas a su esquema real:
-        // const { data } = await sb.from('clientes_vendedor')
-        //      .select('cliente_nombre').eq('vendedor', vendedor);
-        // const dl = document.getElementById('clientesList');
-        // dl.innerHTML = (data||[]).map(r=>`<option value="${r.cliente_nombre}">`).join('');
-    } catch (e) { console.warn('No se pudieron cargar clientes:', e.message); }
-}
-document.getElementById('calc_promotor').addEventListener('change', e => cargarClientesPorVendedor(e.target.value));
 
-// ─── Formulario POP ───────────────────────────────────────────
+// ─── FORMULARIO POP ───────────────────────────────────────────
 const form=document.getElementById('popForm'), btnSubmit=document.getElementById('btnSubmit'),
       fotosGrid=document.getElementById('fotos-grid'), contadorFotos=document.getElementById('contador-fotos'),
       loadingModal=document.getElementById('loadingModal'), loadingStatus=document.getElementById('loadingStatus');
@@ -1122,10 +1116,172 @@ form.addEventListener('submit', async e => {
         if(dbError)throw new Error(dbError.message);
         setLoading(false);showToast('¡Visita registrada con éxito!','success');
         form.reset();fotosArray=[];renderFotos();
+        cargarGaleria(true); // Recargar galeria si se guarda algo
     }catch(err){setLoading(false);showToast(err.message,'error');}
 });
-function setLoading(show,texto='Procesando...'){if(show){loadingModal.classList.add('activo');loadingStatus.textContent=texto;btnSubmit.disabled=true;}else{loadingModal.classList.remove('activo');btnSubmit.disabled=false;loadingStatus.textContent='Iniciando';}}
+
+function setLoading(show,texto='Procesando...'){if(show){loadingModal.classList.add('activo');loadingStatus.textContent=texto;}else{loadingModal.classList.remove('activo');loadingStatus.textContent='Iniciando';}}
 function showToast(message,type='error'){const toast=document.getElementById('toast');document.getElementById('toastMessage').textContent=message;document.getElementById('toastIconSuccess').classList.toggle('hidden',type!=='success');document.getElementById('toastIconError').classList.toggle('hidden',type!=='error');toast.classList.remove('-translate-y-24','opacity-0');toast.classList.add('translate-y-0','opacity-100');setTimeout(()=>{toast.classList.remove('translate-y-0','opacity-100');toast.classList.add('-translate-y-24','opacity-0');},3500);}
+
+// ─── PESTAÑA: GALERÍA (PAGINADA Y SOLO HOY) ───────────────────
+let galeriaPage = 0;
+const pageSize = 10;
+const btnCargarMas = document.getElementById('btnCargarMas');
+const galContainer = document.getElementById('galeria-container');
+
+async function cargarGaleria(reset = false) {
+    if (reset) {
+        galeriaPage = 0;
+        galContainer.innerHTML = '';
+        btnCargarMas.classList.add('hidden');
+        document.getElementById('galeria-vacia').classList.add('hidden');
+        document.getElementById('galeria-total').textContent = 'Cargando...';
+    }
+
+    // Configurar fechas para "Hoy" (Ajustado a Venezuela UTC-4)
+    const tzOffset = -4 * 60 * 60000;
+    const nowLocal = new Date(Date.now() + tzOffset);
+    const startOfDayLocal = new Date(nowLocal.setUTCHours(0,0,0,0) - tzOffset).toISOString();
+    const endOfDayLocal = new Date(nowLocal.setUTCHours(23,59,59,999) - tzOffset).toISOString();
+
+    const from = galeriaPage * pageSize;
+    const to = from + pageSize - 1;
+
+    try {
+        const { data, error, count } = await sb
+            .from('sorteo_registros')
+            .select('*', { count: 'exact' })
+            .gte('created_at', startOfDayLocal)
+            .lte('created_at', endOfDayLocal)
+            .order('created_at', { ascending: false })
+            .range(from, to);
+
+        if (error) throw error;
+
+        document.getElementById('galeria-total').textContent = `${count} visitas hoy`;
+
+        if (count === 0 && reset) {
+            document.getElementById('galeria-vacia').classList.remove('hidden');
+            return;
+        }
+
+        data.forEach(item => {
+            const mats = (item.materiales_entregados || []).map(m => `<span class="bg-gray-100 text-gray-600 text-[10px] px-2 py-0.5 rounded">${m}</span>`).join('');
+            const imgs = (item.fotos_urls || []).map(url => `<img src="${url}" loading="lazy">`).join('');
+            
+            const timeStr = new Date(item.created_at).toLocaleTimeString('es-VE', {hour:'2-digit', minute:'2-digit'});
+            
+            const card = document.createElement('div');
+            card.className = 'gal-card';
+            card.innerHTML = `
+                <div class="p-4 border-b border-gray-100">
+                    <div class="flex justify-between items-start mb-1">
+                        <h3 class="font-bold text-gray-900">${item.cliente_nombre}</h3>
+                        <span class="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">${timeStr}</span>
+                    </div>
+                    <p class="text-xs text-brand-600 font-semibold mb-2">👤 ${item.promotor_nombre}</p>
+                    <div class="flex flex-wrap gap-1">${mats}</div>
+                </div>
+                <div class="gal-img-scroll">${imgs}</div>
+            `;
+            galContainer.appendChild(card);
+        });
+
+        if ((galeriaPage + 1) * pageSize < count) {
+            btnCargarMas.classList.remove('hidden');
+        } else {
+            btnCargarMas.classList.add('hidden');
+        }
+
+    } catch (e) {
+        console.error('Error al cargar galería:', e);
+    }
+}
+btnCargarMas.addEventListener('click', () => { galeriaPage++; cargarGaleria(); });
+
+// ─── PESTAÑA: KPIs (SIN LÍMITE DE 1000) ───────────────────────
+async function cargarKPIs() {
+    document.getElementById('kpi-visitas').textContent = '...';
+    document.getElementById('kpi-pop').textContent = '...';
+    document.getElementById('kpi-compensado').textContent = '...';
+    
+    try {
+        // 1. Visitas y POP (Bypass de limite 1000 iterando)
+        let totalVisitas = 0;
+        let totalPOP = 0;
+        let promotoresCount = {};
+        
+        let fetchMore = true;
+        let from = 0;
+        const limit = 1000;
+
+        while(fetchMore) {
+            const { data, error } = await sb.from('sorteo_registros')
+                .select('promotor_nombre, materiales_entregados')
+                .range(from, from + limit - 1);
+            if (error) throw error;
+            
+            if (data.length < limit) fetchMore = false;
+            from += limit;
+
+            totalVisitas += data.length;
+            
+            data.forEach(row => {
+                // Prevenir NaN si el arreglo viene vacío o nulo
+                const mats = row.materiales_entregados || [];
+                totalPOP += mats.length;
+                
+                const prom = row.promotor_nombre || 'Desconocido';
+                promotoresCount[prom] = (promotoresCount[prom] || 0) + 1;
+            });
+        }
+
+        document.getElementById('kpi-visitas').textContent = totalVisitas;
+        document.getElementById('kpi-pop').textContent = totalPOP;
+
+        // Render Top Promotores
+        const topArray = Object.entries(promotoresCount)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5); // Top 5
+            
+        const topContainer = document.getElementById('kpi-promotores');
+        if(topArray.length > 0) {
+            topContainer.innerHTML = topArray.map((p, i) => `
+                <div class="flex justify-between items-center bg-gray-50 p-2 rounded-lg border border-gray-100">
+                    <span class="text-xs font-bold text-gray-700">${i+1}. ${p[0]}</span>
+                    <span class="text-xs font-extrabold text-brand-600 bg-brand-100 px-2 py-1 rounded">${p[1]}</span>
+                </div>
+            `).join('');
+        } else {
+            topContainer.innerHTML = `<div class="text-sm text-gray-500 text-center py-2">Sin datos suficientes</div>`;
+        }
+
+        // 2. Total Compensado
+        fetchMore = true;
+        from = 0;
+        let totalCompensado = 0;
+        
+        while(fetchMore) {
+            const { data, error } = await sb.from('compensaciones')
+                .select('total_compensar')
+                .range(from, from + limit - 1);
+            if (error) throw error;
+            
+            if (data.length < limit) fetchMore = false;
+            from += limit;
+
+            data.forEach(row => {
+                totalCompensado += (parseFloat(row.total_compensar) || 0);
+            });
+        }
+
+        document.getElementById('kpi-compensado').textContent = `$${totalCompensado.toFixed(2)}`;
+
+    } catch(e) {
+        console.error('Error cargando KPIs:', e);
+        document.getElementById('kpi-visitas').textContent = 'Error';
+    }
+}
 </script>
 
 </body>
