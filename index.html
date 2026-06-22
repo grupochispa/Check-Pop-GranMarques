@@ -397,7 +397,7 @@ function addSkuCard(scroll=false) {
             </div>
             
             <div style="background:#eff6ff;border:1.5px solid #bae6fd;border-radius:14px;padding:12px;">
-                <p style="font-size:11px;font-weight:800;color:#0369a1;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">1️⃣ Factura anterior</p>
+                <p style="font-size:11px;font-weight:800;color:#0369a1;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">1️⃣ Factura a Reconocer</p>
                 <p style="font-size:11px;color:#0369a1;opacity:.75;margin-bottom:10px;">Valores al momento de la compra.</p>
                 <div class="grid2">
                     <div><label class="field-label">Cant. Pacas</label><input type="number" class="sku-p1-pacas input-base" min="1" step="1" placeholder="Ej: 60" data-id="${id}" style="border-color:#bae6fd;"></div>
@@ -574,7 +574,7 @@ document.getElementById('btnCalcCalc').addEventListener('click', () => {
         const n=idx+1, d=card._getCalc();
         if(!d.producto){showToast(`SKU #${n}: seleccione un producto.`,'error');err=true;return;}
         if(!d.factura){showToast(`SKU #${n}: ingrese el número de factura.`,'error');err=true;return;}
-        if(d.p1_pacas<1||d.p1_precio<=0){showToast(`SKU #${n}: complete los datos de la Factura anterior.`,'error');err=true;return;}
+        if(d.p1_pacas<1||d.p1_precio<=0){showToast(`SKU #${n}: complete los datos de la Factura a Reconocer.`,'error');err=true;return;}
         if(d.p2_pacas<1||d.p2_precio<=0){showToast(`SKU #${n}: complete los datos de la Factura nueva.`,'error');err=true;return;}
         if(d.pacas_a_reconocer<1){showToast(`SKU #${n}: ingrese el inventario a reconocer.`,'error');err=true;return;}
         if(d.p2_neto>=d.p1_neto){showToast(`SKU #${n}: el precio nuevo debe ser menor al precio viejo para compensar.`,'error');err=true;return;}
