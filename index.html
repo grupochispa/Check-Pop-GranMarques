@@ -646,7 +646,16 @@ async function generarComprobante(modo){
         const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();
         
         doc.setFillColor(26,43,86);doc.rect(0,0,W,100,'F');
-        if(logoPngBase64){doc.addImage(logoPngBase64,'PNG',W-110,20,60,75);}
+        if(logoPngBase64){
+    try {
+        const logoData = logoPngBase64.startsWith('data:') 
+            ? logoPngBase64 
+            : 'data:image/png;base64,' + logoPngBase64;
+        doc.addImage(logoData, 'PNG', W-110, 20, 60, 75);
+    } catch(logoErr) {
+        console.warn('Logo no cargado:', logoErr.message);
+    }
+}
         doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);
         doc.text('ARROCERA CHISPA C.A.',40,42);
         doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text('RIF: J-30717543-5',40,62);
