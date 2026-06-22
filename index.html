@@ -476,11 +476,8 @@ function addSkuCard(scroll=false) {
     const $ = cls => card.querySelector(cls);
     const selProducto = $('.sku-producto');
     
-    // Factura anterior inputs
     const inpP1Pacas=$('.sku-p1-pacas'), inpP1Precio=$('.sku-p1-precio'), inpP1Promo=$('.sku-p1-promo'), inpP1Prontopago=$('.sku-p1-prontopago');
-    // Factura nueva inputs
     const inpP2Pacas=$('.sku-p2-pacas'), inpP2Precio=$('.sku-p2-precio'), inpP2Promo=$('.sku-p2-promo'), inpP2Prontopago=$('.sku-p2-prontopago');
-    
     const inpRecon=$('.sku-pacas-reconocer'), inpUnidades=$('.sku-unidades-paca');
 
     function computar() {
@@ -642,50 +639,83 @@ function renderPreciosFijos(){
 
 // ─── PDF ──────────────────────────────────────────────────────
 async function generarComprobante(modo){
-    if(!ultimoResultado){showToast('Primero calcule la compensación.','error');return;}
-    if(!window.jspdf||!window.jspdf.jsPDF){showToast('No se pudo cargar el generador de PDF.','error');return;}
-    const{jsPDF}=window.jspdf;const doc=new jsPDF({unit:'pt',format:'a4'});
-    const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();
-    doc.setFillColor(26,43,86);doc.rect(0,0,W,100,'F');
-    if(logoPngBase64){doc.addImage(logoPngBase64,'PNG',W-110,20,60,75);}
-    doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);
-    doc.text('ARROCERA CHISPA C.A.',40,42);
-    doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text('RIF: J-30717543-5',40,62);
-    doc.setFontSize(9);doc.text('Dirección Principal: Carretera vía el Jobal a 2 Km Carretera Nacional',40,76);doc.text('Turen Píritu GALPON.',40,88);
-    let y=140;doc.setTextColor(17,24,39);doc.setFontSize(14);doc.setFont('helvetica','bold');doc.text('COMPROBANTE DE COMPENSACIÓN',40,y);y+=24;
-    doc.setFontSize(10);const fecha=new Date().toLocaleDateString('es-VE');
-    doc.setFont('helvetica','bold');doc.text('Vendedor:',40,y);doc.setFont('helvetica','normal');doc.text(ultimoResultado.promotor_nombre||'-',110,y);
-    doc.setFont('helvetica','bold');doc.text('Fecha:',W-160,y);doc.setFont('helvetica','normal');doc.text(fecha,W-120,y);y+=18;
-    doc.setFont('helvetica','bold');doc.text('Cliente:',40,y);doc.setFont('helvetica','normal');doc.text(ultimoResultado.cliente_nombre||'-',110,y);y+=24;
-    doc.setDrawColor(229,231,235);doc.line(40,y,W-40,y);y+=22;
-    let granTotal=0;
-    ultimoResultado.skus.forEach((s,i)=>{
-        if(y>H-140){doc.addPage();y=60;}
-        doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(180,83,9);doc.text(`${i+1}. ${s.producto}`,40,y);y+=16;
-        doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(107,114,128);doc.text(`Factura: ${s.factura}`,40,y);y+=14;
-        doc.setTextColor(17,24,39);doc.text(`Precio viejo/paca: $${s.p1_neto.toFixed(2)}   Precio nuevo/paca: $${s.p2_neto.toFixed(2)}`,40,y);y+=14;
+    try {
+        if(!ultimoResultado){showToast('Primero calcule la compensación.','error');return;}
+        if(!window.jspdf||!window.jspdf.jsPDF){showToast('No se pudo cargar el generador de PDF.','error');return;}
+        const{jsPDF}=window.jspdf;const doc=new jsPDF({unit:'pt',format:'a4'});
+        const W=doc.internal.pageSize.getWidth(),H=doc.internal.pageSize.getHeight();
         
-        if (s.p1_prontopago_pct > 0 || s.p2_prontopago_pct > 0) {
-            doc.setTextColor(162,28,175);
-            let ppText = [];
-            if (s.p1_prontopago_pct > 0) ppText.push(`Prontopago ant: ${s.p1_prontopago_pct}%`);
-            if (s.p2_prontopago_pct > 0) ppText.push(`Prontopago nuevo: ${s.p2_prontopago_pct}%`);
-            doc.text(ppText.join('   '), 40, y); y+=14;
-        }
+        doc.setFillColor(26,43,86);doc.rect(0,0,W,100,'F');
+        if(logoPngBase64){doc.addImage(logoPngBase64,'PNG',W-110,20,60,75);}
+        doc.setTextColor(255,255,255);doc.setFont('helvetica','bold');doc.setFontSize(16);
+        doc.text('ARROCERA CHISPA C.A.',40,42);
+        doc.setFontSize(10);doc.setFont('helvetica','normal');doc.text('RIF: J-30717543-5',40,62);
+        doc.setFontSize(9);doc.text('Dirección Principal: Carretera vía el Jobal a 2 Km Carretera Nacional',40,76);doc.text('Turen Píritu GALPON.',40,88);
+        
+        let y=140;doc.setTextColor(17,24,39);doc.setFontSize(14);doc.setFont('helvetica','bold');doc.text('COMPROBANTE DE COMPENSACIÓN',40,y);y+=24;
+        doc.setFontSize(10);const fecha=new Date().toLocaleDateString('es-VE');
+        doc.setFont('helvetica','bold');doc.text('Vendedor:',40,y);doc.setFont('helvetica','normal');doc.text(ultimoResultado.promotor_nombre||'-',110,y);
+        doc.setFont('helvetica','bold');doc.text('Fecha:',W-160,y);doc.setFont('helvetica','normal');doc.text(fecha,W-120,y);y+=18;
+        doc.setFont('helvetica','bold');doc.text('Cliente:',40,y);doc.setFont('helvetica','normal');doc.text(ultimoResultado.cliente_nombre||'-',110,y);y+=24;
+        doc.setDrawColor(229,231,235);doc.line(40,y,W-40,y);y+=22;
+        
+        let granTotal=0;
+        ultimoResultado.skus.forEach((s,i)=>{
+            if(y>H-140){doc.addPage();y=60;}
+            doc.setFont('helvetica','bold');doc.setFontSize(11);doc.setTextColor(180,83,9);doc.text(`${i+1}. ${s.producto}`,40,y);y+=16;
+            doc.setFont('helvetica','normal');doc.setFontSize(9);doc.setTextColor(107,114,128);doc.text(`Factura: ${s.factura}`,40,y);y+=14;
+            doc.setTextColor(17,24,39);doc.text(`Precio viejo/paca: $${(s.p1_neto||0).toFixed(2)}   Precio nuevo/paca: $${(s.p2_neto||0).toFixed(2)}`,40,y);y+=14;
+            
+            if (s.p1_prontopago_pct > 0 || s.p2_prontopago_pct > 0) {
+                doc.setTextColor(162,28,175);
+                let ppText = [];
+                if (s.p1_prontopago_pct > 0) ppText.push(`Prontopago ant: ${s.p1_prontopago_pct}%`);
+                if (s.p2_prontopago_pct > 0) ppText.push(`Prontopago nuevo: ${s.p2_prontopago_pct}%`);
+                doc.text(ppText.join('   '), 40, y); y+=14;
+            }
 
-        doc.setTextColor(17,24,39);
-        doc.text(`Inventario a reconocer: ${s.pacas_a_reconocer}   Diferencia/paca: $${s.diferencia_paca.toFixed(2)}`,40,y);y+=14;
-        doc.setFont('helvetica','bold');doc.setTextColor(22,163,74);doc.text(`Nota de crédito: $${s.total_compensar.toFixed(2)}`,40,y);y+=18;
-        granTotal+=s.total_compensar;
-        doc.setDrawColor(243,244,246);doc.line(40,y-4,W-40,y-4);y+=12;
-    });
-    if(y>H-90){doc.addPage();y=60;}
-    doc.setFillColor(240,253,244);doc.roundedRect(40,y,W-80,40,6,6,'F');doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(22,101,52);doc.text('TOTAL NOTA DE CRÉDITO',56,y+25);doc.text(`$${granTotal.toFixed(2)}`,W-56,y+25,{align:'right'});y+=56;
-    if(ultimoResultado.observaciones){doc.setTextColor(107,114,128);doc.setFont('helvetica','normal');doc.setFontSize(9);doc.text('Obs: '+ultimoResultado.observaciones,40,y,{maxWidth:W-80});}
-    const nombreArch=`Comprobante_${(ultimoResultado.cliente_nombre||'cliente').replace(/\s+/g,'_')}.pdf`;
-    if(modo==='share'){try{const blob=doc.output('blob');const file=new File([blob],nombreArch,{type:'application/pdf'});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Comprobante de Compensación',text:`Comprobante – ${ultimoResultado.cliente_nombre}`});return;}}catch(e){console.log(e);}}
-    doc.save(nombreArch);
+            doc.setTextColor(17,24,39);
+            doc.text(`Inventario a reconocer: ${s.pacas_a_reconocer||0}   Diferencia/paca: $${(s.diferencia_paca||0).toFixed(2)}`,40,y);y+=14;
+            doc.setFont('helvetica','bold');doc.setTextColor(22,163,74);doc.text(`Nota de crédito: $${(s.total_compensar||0).toFixed(2)}`,40,y);y+=18;
+            granTotal+=(s.total_compensar||0);
+            doc.setDrawColor(243,244,246);doc.line(40,y-4,W-40,y-4);y+=12;
+        });
+        
+        if(y>H-90){doc.addPage();y=60;}
+        doc.setFillColor(240,253,244);doc.roundedRect(40,y,W-80,40,6,6,'F');
+        doc.setFont('helvetica','bold');doc.setFontSize(13);doc.setTextColor(22,101,52);
+        doc.text('TOTAL NOTA DE CRÉDITO',56,y+25);doc.text(`$${granTotal.toFixed(2)}`,W-56,y+25,{align:'right'});y+=56;
+        
+        if(ultimoResultado.observaciones){
+            doc.setTextColor(107,114,128);doc.setFont('helvetica','normal');doc.setFontSize(9);
+            doc.text('Obs: '+ultimoResultado.observaciones,40,y,{maxWidth:W-80});
+        }
+        
+        const nombreArch=`Comprobante_${(ultimoResultado.cliente_nombre||'cliente').replace(/\s+/g,'_')}.pdf`;
+        
+        if(modo==='share'){
+            try{
+                const blob=doc.output('blob');
+                const file=new File([blob],nombreArch,{type:'application/pdf'});
+                if(navigator.canShare && navigator.canShare({files:[file]})){
+                    await navigator.share({files:[file],title:'Comprobante de Compensación',text:`Comprobante – ${ultimoResultado.cliente_nombre}`});
+                    return;
+                } else {
+                    showToast('Tu navegador no soporta compartir este archivo.', 'error');
+                }
+            }catch(e){
+                console.error(e);
+                showToast('Error al compartir: ' + e.message, 'error');
+            }
+        } else {
+            doc.save(nombreArch);
+        }
+    } catch(e) {
+        console.error(e);
+        showToast('Error al crear PDF: ' + e.message, 'error');
+    }
 }
+
 document.getElementById('btnPDF').addEventListener('click',()=>generarComprobante('download'));
 document.getElementById('btnWhatsApp').addEventListener('click',()=>generarComprobante('share'));
 
