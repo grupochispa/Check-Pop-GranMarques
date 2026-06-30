@@ -361,7 +361,7 @@ const { createClient } = window.supabase;
 const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const SKUS = [
-    'GRAN MARQUÉS GOURMET 900g','DON JULIÁN TIPO 1 1kg','DON JULIÁN TIPO 2 900g',
+    'GRAN MARQUÉS GOURMET 900g','JULIÁN TIPO 1 1kg','JULIÁN TIPO 2 900g','DON JULIÁN TIPO 2 2.5kg',
     'DON JULIÁN TIPO 3','GRAN MARQUÉS PREMIUM 1kg','GRAN MARQUÉS SELECTO 850g','GRAN MARQUÉS SELECTO 2.5kg'
 ];
 const skuOptions = (sel='') => SKUS.map(s=>`<option value="${s}"${s===sel?' selected':''}>${s}</option>`).join('');
